@@ -1,0 +1,62 @@
+body {
+  font: 10px sans-serif;
+}
+ 
+.rules line, .rules path {
+  /*shape-rendering: crispEdges;*/
+  stroke: #000;
+}
+ 
+.rules .tick {
+}
+.rules .minor {
+  stroke: #BBB;
+}
+.rules .domain {
+  fill: none;
+}
+ 
+.grid .tick {
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.QiNames {
+  font-size: 30px;
+  text-anchor: "middle";
+  cursor:default;
+}
+
+.ivcont {
+  display: inline-block;
+}
+
+.ivcont .script {
+  overflow : scroll;
+  height : 500px;
+  width : 150px;
+}
+
+.ivcont .script p {
+	font-size: 15px;
+	font-family: 宋体;
+	cursor:default;
+}
+
+.userviscontrols {
+  display: inline-block;
+  text-align : center;
+  vertical-align: middle;
+}
+
+.ivcont h2 {
+  font-family : 宋体;
+  font-size : 25px;
+  color : black;
+  text-align : center;
+  padding : 0px;
+} 
+
+img {
+  cursor:pointer;
+}

@@ -18,7 +18,10 @@ var Pieces = {
 
 // Data model
 function XiangqiData() {
-    this.board= [ // TODO: initial positions are needed.
+    this.board= [
+        //{ name: Pieces.JU, player: 0 }, ...
+    ];
+    this.board_init= [
         //{ name: Pieces.JU, player: 0 }, ...
     ];
     this.moves= [
@@ -132,12 +135,58 @@ XiangqiEngine.prototype = {
     },
     
     
-    loadMoves: function(moves_string) {
-        // 读取字符串棋谱
+    loadMoves: function(binit, movelist) {
+        // 读取字符串棋谱, 返回初始局面和棋子移动
+        var board_init = [],
+            board = [],
+            moves = [];
+        var init_pieces = [
+            Pieces.JU, Pieces.MA, Pieces.XIANG0, Pieces.SHI0,
+            Pieces.SHUAI,
+            Pieces.SHI0, Pieces.XIANG0, Pieces.MA, Pieces.JU,
+            Pieces.PAO, Pieces.PAO,
+            Pieces.BING, Pieces.BING, Pieces.BING, Pieces.BING, Pieces.BING, 
+            
+            Pieces.JU, Pieces.MA, Pieces.XIANG1, Pieces.SHI1,
+            Pieces.JIANG,
+            Pieces.SHI1, Pieces.XIANG1, Pieces.MA, Pieces.JU,
+            Pieces.PAO, Pieces.PAO,
+            Pieces.ZU, Pieces.ZU, Pieces.ZU, Pieces.ZU, Pieces.ZU,
+        ];
+        for (var i = 0; i < binit.length; i+=2) {
+            var x = parseInt(binit[i]),
+                y = 9-parseInt(binit[i+1]);
+            if (x != 9) {
+                // 99: 不存在
+                board[x+y*9] = board_init[x+y*9] = {
+                    name: init_pieces[i/2],
+                    player: (i<16*2)? 0 : 1
+                };
+            }
+        }
+        
+        for (var i = 0; i < movelist.length; i+=4) {
+            var from = [parseInt(movelist[i]), 9-parseInt(movelist[i+1])],
+                to   = [parseInt(movelist[i+2]), 9-parseInt(movelist[i+3])];
+            var eaten = board[to[0]+to[1]*9];
+            board[to[0]+to[1]*9] = board[from[0]+from[1]*9];
+            board[from[0]+from[1]*9] = null;
+            moves.push({
+                from:   from,
+                to:     to,
+                name:   board[to[0]+to[1]*9].name,
+                eaten:  eaten,
+                player: board[to[0]+to[1]*9].player,
+            });
+        }
+        
+        return [board_init, moves];
     },  
     dumpMoves: function() {
         // 导出字符串棋谱
         // return moves_string
+        
+        
     },
     
     

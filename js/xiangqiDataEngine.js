@@ -128,8 +128,40 @@ XiangqiEngine.prototype = {
     undoMove: function() {
         // 撤销一步
     },
-    canMove: function(from, to, player) {
+    canMove: function(from, player, board) {
         // 是否合法
+		// return all the possible "to"s
+		var tos=[];
+		var name = board[from[0]+from[1]*9];
+		switch (name) {
+			case "车":
+				 
+			break;
+			case "马":
+				//可行解：不别马脚&在棋盘内&不吃自己的子
+				var majiao=[[from[0]-1,from[1]],[from[0]-1,from[1]],[from[0],from[1]+1],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0]+1,from[1]],[from[0],from[1]-1],[from[0],from[1]-1]];
+				var possibletos=[[from[0]-2,from[1]-1],[from[0]-2,from[1]+1],[from[0]-1,from[1]+2],[from[0]+1,from[1]+2],[from[0]+2,from[1]+1],[from[0]+2,from[1]-1],[from[0]+1,from[1]-2],[from[0]-1,from[1]+2]];
+				for (var i=0; i<possibletos.length; i++) {
+					if (board[majiao[i][0]+majiao[i][1]*9]==null & possibletos[i][0]>=0 & possibletos[i][0]<9 & possibletos[i][1]>=0 & possibletos[i][1]<10 & board[possibletos[i][0]+possibletos[i][1]*9].player!=player) tos.push(possibletos[i]);
+				}
+			break;
+			case ("相" || "象"):
+				//可行解：不别相脚&在棋盘内&不吃自己的子
+				var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+				var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
+				for (var i=0; i<possibletos.length; i++) {
+					if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null & possibletos[i][0]>=0 & possibletos[i][0]<9 & possibletos[i][1]>=0 & possibletos[i][1]<10 & board[possibletos[i][0]+possibletos[i][1]*9].player!=player) tos.push(possibletos[i]);	
+				}
+			break;
+			case ("仕" || "士"):
+				//可行解：在棋盘内&不吃自己的子
+				var possibletos=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+				for (var i=0; i<possibletos.length; i++) {
+					if (possibletos[i][0]>=0 & possibletos[i][0]<9 & possibletos[i][1]>=0 & possibletos[i][1]<10 & board[possibletos[i][0]+possibletos[i][1]*9].player!=player) tos.push(possibletos[i]);	
+				}			
+			break;
+		}
+		return tos;
     },
     
     

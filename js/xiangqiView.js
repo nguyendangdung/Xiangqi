@@ -195,4 +195,5 @@ XiangqiView.prototype = {
         // TODO: Event listener
         this.d3MouseEvent();
     },
+	
 };

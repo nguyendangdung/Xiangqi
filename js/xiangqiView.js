@@ -153,10 +153,40 @@ XiangqiView.prototype = {
         //棋子拖动
         var drag = d3.behavior.drag()
             .origin(Object)
-            //.on("dragstart", dragstart)
+            .on("dragstart", dragstart)
             .on("drag", dragmove)
             .on("dragend", dragend);
-            
+        
+		function dragstart(d,i) {
+			//highlight possible places
+			//临时代码，测试canMove
+			var tos=self.engine.canMove(d.pos,d.player,self.data.board);
+			if (tos) {
+				for (var i=0;i<tos.length;i++) {
+					if (self.data.board[tos[i][0]+tos[i][1]*9]==null) {
+						self.svg.append("circle")
+							.attr("class", "hi")
+							.attr("cx", function(d) {return self.gridToX(tos[i][0]);})
+							.attr("cy", function(d) {return self.gridToY(tos[i][1]);})
+							.attr("r", self.ra)
+							.attr("transform", "translate(" + 40 + "," + 40 + ")")
+							.style("stroke-width","3px")
+							.style("fill-opacity",0)
+							.style("stroke", "blue");
+					}
+				}					
+				d3.selectAll("circle.QiZi")
+				  .style("stroke","blue")
+				  .style("stroke-width", function(d) {
+					var tmpflag=false;
+					for (var i=0;i<tos.length;i++) {
+						if (d.pos[0]==tos[i][0]&&d.pos[1]==tos[i][1]) tmpflag=true;
+					}
+					return (tmpflag)? "3px":"0px";
+				  });
+			} else {alert("The piece have no legal move");}
+		}
+		
         function dragmove(d, i) {
             // TODO: 此为临时代码
             //javascript的复杂数据对象如数组，object传值时复址，所以会同时改变
@@ -164,7 +194,7 @@ XiangqiView.prototype = {
             //var newObject = jQuery.extend({}, oldObject);
             // Deep copy
             //var newObject = jQuery.extend(true, {}, oldObject);
-            console.log(d3.event);
+           // console.log(d3.event);
             d.dragx = d3.round(self.gridToX.invert(d3.event.x));
             d.dragy = d3.round(self.gridToY.invert(d3.event.y));
             d.x = self.gridToX(d.dragx);

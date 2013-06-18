@@ -28,6 +28,7 @@ function XiangqiData() {
         //{
         //    from:   [1,1],
         //    to:     [1,2],
+		//	  name: null, // or Pieces.Ma
         //    eaten:  null, // or Pieces.Ma
         //    player: 0, // moved by player 0
         //}, ...
@@ -227,6 +228,51 @@ XiangqiEngine.prototype = {
     
     moveToScript: function(move) {
         // 转换某一步为标准棋谱
+		var scriptNum1 = null, scriptNum2 = null,scriptDir = null;
+		//Chscr用于棋谱显示
+		var Chscr = ["九","八","七","六","五","四","三","二","一"];
+		if (move.player == 0 && (move.name=="车" || move.name == "帅" || move.name == "炮" || move.name == "兵")) {
+			scriptNum1 = Chscr[move.from[0]];
+			if (move.from[1] > move.to[1]) {
+				scriptNum2 = Chscr[9 - move.from[1] + move.to[1]];
+				scriptDir = "退";
+			} else if (move.from[1] < move.to[1]) {
+				scriptNum2 = Chscr[9 - move.to[1] + move.from[1]];
+				scriptDir = "进";
+			} else {
+				scriptNum2 = Chscr[move.to[0]];
+				scriptDir = "平";
+			}
+		} else if (move.player == 0 && (move.name=="马" || move.name == "仕" || move.name == "相")) {
+			scriptNum1 = Chscr[move.from[0]];
+			scriptNum2 = Chscr[move.to[0]];
+			if (move.from[1] > move.to[1]) {
+				scriptDir = "退";
+			} else {
+				scriptDir = "进";
+			}			
+		}　else if (move.player == 1 && (move.name=="车" || move.name == "将" || move.name == "炮" || move.name == "卒")) {
+			scriptNum1 = parseInt(move.from[0])+1;
+			if (move.from[1] < move.to[1]) {
+				scriptNum2 = move.to[1] - move.from[1];
+				scriptDir = "退";
+			} else if (move.from[1] > move.to[1]) {
+				scriptNum2 = move.from[1] - move.to[1];
+				scriptDir = "进";
+			} else {
+				scriptNum2 = parseInt(move.to[0])+1;
+				scriptDir = "平";
+			}					
+		}　else {
+			scriptNum1 = parseInt(move.from[0])+1;
+			scriptNum2 = parseInt(move.to[0])+1;
+			if (move.from[1] < move.to[1]) {
+				scriptDir = "退";
+			} else {
+				scriptDir = "进";
+			}					
+		}
+		return (move.name + scriptNum1 + scriptDir + scriptNum2);
     },
     
     getAllPieces: function() {

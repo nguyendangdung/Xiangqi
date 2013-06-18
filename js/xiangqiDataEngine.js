@@ -18,7 +18,10 @@ var Pieces = {
 
 // Data model
 function XiangqiData() {
-    this.board= [ // TODO: initial positions are needed.
+    this.board= [
+        //{ name: Pieces.JU, player: 0 }, ...
+    ];
+    this.board_init= [
         //{ name: Pieces.JU, player: 0 }, ...
     ];
     this.moves= [
@@ -205,12 +208,93 @@ XiangqiEngine.prototype = {
     },
     
     
-    loadMoves: function(moves_string) {
-        // 读取字符串棋谱
+    loadMoves: function(binit, movelist) {
+        // 读取字符串棋谱, 返回初始局面和棋子移动
+        var board_init = [],
+            board = [],
+            moves = [];
+        var init_pieces = [
+            Pieces.JU, Pieces.MA, Pieces.XIANG0, Pieces.SHI0,
+            Pieces.SHUAI,
+            Pieces.SHI0, Pieces.XIANG0, Pieces.MA, Pieces.JU,
+            Pieces.PAO, Pieces.PAO,
+            Pieces.BING, Pieces.BING, Pieces.BING, Pieces.BING, Pieces.BING, 
+            
+            Pieces.JU, Pieces.MA, Pieces.XIANG1, Pieces.SHI1,
+            Pieces.JIANG,
+            Pieces.SHI1, Pieces.XIANG1, Pieces.MA, Pieces.JU,
+            Pieces.PAO, Pieces.PAO,
+            Pieces.ZU, Pieces.ZU, Pieces.ZU, Pieces.ZU, Pieces.ZU,
+        ];
+        for (var i = 0; i < binit.length; i+=2) {
+            var x = parseInt(binit[i]),
+                y = 9-parseInt(binit[i+1]);
+            if (x != 9) {
+                // 99: 不存在
+                board[x+y*9] = board_init[x+y*9] = {
+                    name: init_pieces[i/2],
+                    player: (i<16*2)? 0 : 1
+                };
+            }
+        }
+        
+        for (var i = 0; i < movelist.length; i+=4) {
+            var from = [parseInt(movelist[i]), 9-parseInt(movelist[i+1])],
+                to   = [parseInt(movelist[i+2]), 9-parseInt(movelist[i+3])];
+            var eaten = board[to[0]+to[1]*9];
+            board[to[0]+to[1]*9] = board[from[0]+from[1]*9];
+            board[from[0]+from[1]*9] = null;
+            moves.push({
+                from:   from,
+                to:     to,
+                name:   board[to[0]+to[1]*9].name,
+                eaten:  eaten,
+                player: board[to[0]+to[1]*9].player,
+            });
+        }
+        
+        for (var i = 0; i < board_init.length; i++)
+            if (board_init[i] === undefined)
+                board_init = null;
+        
+        return [board_init, moves];
     },  
     dumpMoves: function() {
         // 导出字符串棋谱
         // return moves_string
+        var binit = "",
+            movelist = "";
+        var init_pieces = [
+            Pieces.JU, Pieces.MA, Pieces.XIANG0, Pieces.SHI0,
+            Pieces.SHUAI,
+            Pieces.SHI0, Pieces.XIANG0, Pieces.MA, Pieces.JU,
+            Pieces.PAO, Pieces.PAO,
+            Pieces.BING, Pieces.BING, Pieces.BING, Pieces.BING, Pieces.BING, 
+            
+            Pieces.JU, Pieces.MA, Pieces.XIANG1, Pieces.SHI1,
+            Pieces.JIANG,
+            Pieces.SHI1, Pieces.XIANG1, Pieces.MA, Pieces.JU,
+            Pieces.PAO, Pieces.PAO,
+            Pieces.ZU, Pieces.ZU, Pieces.ZU, Pieces.ZU, Pieces.ZU,
+        ];
+        
+        var tmpbinit = {};
+        for (var i=0; i<9; i++)
+            for (var j=0; j<10; j++) {
+                if (this.data.board_init[j*9+i] && this.data.board_init[j*9+i] !== null)
+                    tmpbinit[this.data.board_init[j*9+i].name + this.data.board[j*9+i].player] = i+""+(9-j);
+        }
+        for (var i=0; i<init_pieces.length; i++) {
+            binit += tmpbinit[init_pieces[i] + ((i<16*2)? 0 : 1)];
+        }
+        
+        for (var i=0; i<this.data.moves.length; i++) {
+            var from = this.data.moves[i].from,
+                to   = this.data.moves[i].to;
+            movelist += ""+from[0]+(9-from[1])+to[0]+(9-to[1]);
+        }
+        
+        return { binit: binit, movelist: movelist };
     },
     
     

@@ -106,13 +106,6 @@ XiangqiView.prototype = {
         
         var allPieces = this.engine.getAllPieces();
         
-        // TODO: 临时代码
-        //add attribute x,y to function the "drag"
-        for (var ii = 0; ii < allPieces.length; ii++) {
-            allPieces[ii].x = self.gridToX(allPieces[ii].pos[0]);
-            allPieces[ii].y = self.gridToY(allPieces[ii].pos[1]);
-        }
-        
         var cir = this.svg.selectAll("circle")
                     .data(allPieces);
         
@@ -121,6 +114,7 @@ XiangqiView.prototype = {
             .append("circle")
             .attr("class", "QiZi")
             //.attr("id", function(d) {return "c" + d.id.toString();})
+            .attr("id", function(d) {return "qizi-"+d.pos[0]+"-"+d.pos[1]})
             .attr("cx", function(d) {return self.gridToX(d.pos[0]);})
             .attr("cy", function(d) {return self.gridToY(d.pos[1]);})
             .attr("r", this.ra)
@@ -135,11 +129,34 @@ XiangqiView.prototype = {
         text.append("svg:text")
             .attr("class", "QiNames")
             //.attr("id", function(d) {return "t" + d.id.toString();})
+            .attr("id", function(d) {return "qiname-"+d.pos[0]+"-"+d.pos[1]})
             .attr("x", function(d) {return self.gridToX(d.pos[0]);})
             .attr("y", function(d) {return self.gridToY(d.pos[1]);})
             .attr("transform", "translate(" + 25 + "," + 50 + ")")
             .text(function(d) { return d.name; })
             //.call(drag);
+    },
+    
+    drawPlace: function(pos, clazz) {
+        // 在pos位置添加以clazz为类的circle
+        var self = this;
+        self.svg.append("circle")
+            .attr("class", clazz)
+            .attr("cx", function(d) {return self.gridToX(pos[0]);})
+            .attr("cy", function(d) {return self.gridToY(pos[1]);})
+            .attr("r", self.ra)
+            .attr("transform", "translate(" + 40 + "," + 40 + ")")
+            //.style("stroke-width","3px")
+            //.style("fill-opacity",0)
+            //.style("stroke", "blue");
+    },
+    
+    drawPossiblePosition: function(pos) {
+        this.drawPlace(pos, "possible-position");
+    },
+    drawEatingPosition: function(pos) {
+        d3.select("#qizi-"+pos[0]+"-"+pos[1])
+          .classed("eating-position", true);
     },
     
     
@@ -164,26 +181,11 @@ XiangqiView.prototype = {
 			if (tos) {
 				for (var i=0;i<tos.length;i++) {
 					if (self.data.board[tos[i][0]+tos[i][1]*9]==null) {
-						self.svg.append("circle")
-							.attr("class", "hi")
-							.attr("cx", function(d) {return self.gridToX(tos[i][0]);})
-							.attr("cy", function(d) {return self.gridToY(tos[i][1]);})
-							.attr("r", self.ra)
-							.attr("transform", "translate(" + 40 + "," + 40 + ")")
-							.style("stroke-width","3px")
-							.style("fill-opacity",0)
-							.style("stroke", "blue");
-					}
-				}					
-				d3.selectAll("circle.QiZi")
-				  .style("stroke","blue")
-				  .style("stroke-width", function(d) {
-					var tmpflag=false;
-					for (var i=0;i<tos.length;i++) {
-						if (d.pos[0]==tos[i][0]&&d.pos[1]==tos[i][1]) tmpflag=true;
-					}
-					return (tmpflag)? "3px":"0px";
-				  });
+						self.drawPossiblePosition(tos[i]);
+					} else {
+                        self.drawEatingPosition(tos[i]);
+                    }
+				}
 			} else {alert("The piece have no legal move");}
 		}
 		
@@ -194,17 +196,23 @@ XiangqiView.prototype = {
             //var newObject = jQuery.extend({}, oldObject);
             // Deep copy
             //var newObject = jQuery.extend(true, {}, oldObject);
-           // console.log(d3.event);
-            d.dragx = d3.round(self.gridToX.invert(d3.event.x));
-            d.dragy = d3.round(self.gridToY.invert(d3.event.y));
-            d.x = self.gridToX(d.dragx);
-            d.y = self.gridToY(d.dragy);
+            var pos = d3.mouse(this);
+            pos = [
+                d3.round(self.gridToX.invert(pos[0])),
+                d3.round(self.gridToY.invert(pos[1]))
+            ];
+            // 临时代码，此时无作用
             return 0;
         }
 
         function dragend(d) {
             // TODO: 此为临时代码
-            self.engine.newMove(d.pos, [d.dragx, d.dragy], d.name, d.player);
+            var pos = d3.mouse(this);
+            pos = [
+                d3.round(self.gridToX.invert(pos[0])),
+                d3.round(self.gridToY.invert(pos[1]))
+            ];
+            self.engine.newMove(d.pos, pos, d.name, d.player);
             self.drawPieces();
             self.d3MouseEvent(); // Very bad practice... May have memory leaks...
         }

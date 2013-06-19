@@ -27,6 +27,17 @@ body {
   cursor:default;
 }
 
+circle.possible-position {
+  stroke: blue;
+  stroke-width: 3px;
+  fill-opacity: 0;
+}
+circle.QiZi.eating-position {
+  stroke: blue;
+  stroke-width: 3px;
+}
+
+
 #qipan-container {
   display: inline-block;
 }

@@ -204,7 +204,7 @@ XiangqiView.prototype = {
 
         function dragend(d) {
             // TODO: 此为临时代码
-            self.engine.newMove(d.pos, [d.dragx, d.dragy], d.player);
+            self.engine.newMove(d.pos, [d.dragx, d.dragy], d.name, d.player);
             self.drawPieces();
             self.d3MouseEvent(); // Very bad practice... May have memory leaks...
         }
@@ -226,4 +226,17 @@ XiangqiView.prototype = {
         this.d3MouseEvent();
     },
 	
+	undo: function() {
+		this.engine.undoMove();
+		this.drawPieces();
+		this.d3MouseEvent();
+	},
+	
+	showscript: function(container) {
+		var self=this;
+		var con=d3.select(container);
+		con.selectAll("p").remove();
+		var pp=con.selectAll("p").data(this.engine.data.moves);
+		pp.enter().append("p").html(function (d) {return self.engine.moveToScript(d);}); 
+	},
 };

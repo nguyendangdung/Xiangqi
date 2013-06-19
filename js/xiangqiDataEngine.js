@@ -29,7 +29,7 @@ function XiangqiData() {
         //    from:   [1,1],
         //    to:     [1,2],
 		//	  name: null, // or Pieces.Ma
-        //    eaten:  null, // or Pieces.Ma
+        //    eaten:  null, // or {Pieces.Ma, player}
         //    player: 0, // moved by player 0
         //}, ...
     ]; 
@@ -115,7 +115,7 @@ XiangqiEngine.prototype = {
     },
     
     
-    newMove: function(from, to, player) {
+    newMove: function(from, to, name, player) {
         // 新一步
         // TODO: 此为临时代码
         var eaten = this.data.board[to[0]+to[1]*9];
@@ -124,12 +124,23 @@ XiangqiEngine.prototype = {
         this.data.moves.push({
             from:   from,
             to:     to,
+			name:	name,
             eaten:  eaten,
             player: player,
         });
     },
     undoMove: function() {
         // 撤销一步
+		// 临时代码，to do
+		var l=this.data.moves.length;
+		if (l==0) {alert("Can not undo further.");}
+		else {
+			var move=this.data.moves[this.data.moves.length-1];
+			this.data.board[move.from[0]+move.from[1]*9] = {name:move.name, player:move.player};
+			this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
+			this.data.moves=this.data.moves.slice(0,this.data.moves.length-1);
+			move=this.data.moves;
+		}
     },
     canMove: function(from, player, board) {
         // 是否合法
@@ -252,7 +263,7 @@ XiangqiEngine.prototype = {
 			}
 		} else {
 			// 卒可行解：过河否&在棋盘内&不吃自己的子
-			if (from[1]>4 && (board[from[0]+(from[1]+1)*9]==null || board[from[0]+(from[1]+1)*9].player!=player)) tos.push([from[0],from[1]-1]);
+			if (from[1]>4 && (board[from[0]+(from[1]-1)*9]==null || board[from[0]+(from[1]-1)*9].player!=player)) tos.push([from[0],from[1]-1]);
 			if (from[1]<5) {
 				var possibletos=[[from[0]-1,from[1]],[from[0],from[1]-1],[from[0]+1,from[1]]];
 				for (var i=0; i<possibletos.length; i++) {

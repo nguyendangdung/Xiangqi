@@ -27,17 +27,18 @@ body {
   cursor:default;
 }
 
-.ivcont {
+#qipan-container {
   display: inline-block;
 }
 
-.ivcont .script {
+#qipu-container {
+  display: inline-block;
   overflow : scroll;
   height : 500px;
   width : 150px;
 }
 
-.ivcont .script p {
+#qipu-container p {
 	font-size: 15px;
 	font-family: 宋体;
 	cursor:default;

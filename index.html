@@ -48,11 +48,10 @@
         // document ready:
         var xqData = new XiangqiData(),
             xqEngine = new XiangqiEngine(xqData),
-            xqView = new XiangqiView("#qipan-container"),
+            xqView = new XiangqiView("#qipan-container", 500, 500, '#qipu-container'),
             xqController = new XiangqiController();
 
         // TODO: Rather ugly codes below
-        xqView.engine = xqEngine;
         xqView.controller = xqController;
         xqController.view = xqView;
         xqController.engine = xqEngine;
@@ -61,10 +60,10 @@
     </script>
 	<div id="button-container">
 		<button onclick="">下一步</button>
-		<button onclick="xqView.undo();">上一步</button>
+		<button onclick="xqController.undo();">上一步</button>
 		<button onclick="">回到初始局面</button>
 		<button onclick="">旋转</button>
-		<button onclick="xqView.showscript('#qipu-container');">显示棋谱</button>
+		<button onclick="xqController.showAllScripts();">显示棋谱</button>
 		<button onclick="">四人游戏</button>
 	</div>	
   </body>

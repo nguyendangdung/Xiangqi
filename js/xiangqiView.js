@@ -1,14 +1,14 @@
 
 
 // View
-function XiangqiView(container, width, height) {
+function XiangqiView(container, width, height, qipuBox) {
     this.container = d3.select(container);
+    this.qipuBox = d3.select(qipuBox);
     //width,height,pad,ra分别为棋盘长、宽、边距、棋子大小 
     this.width = width || 500;
     this.height = height || 500;
     this.pad = 80;
     this.ra = 25;
-    this.engine = null; // reference to XiangqiEngine;
     this.controller = null; //reference to XiangqiController;
     
     this.gridToX = d3.scale.linear().domain([0, 8]).range([0,this.width]);
@@ -101,14 +101,13 @@ XiangqiView.prototype = {
     },
     
     
-    drawPieces: function() {
+    drawPieces: function(allPieces) {
         // 画棋子，会清空原有棋子
         var self = this; // 内部函数中的this用self代替
         
         this.svg.selectAll("circle").remove();
         this.svg.selectAll(".QiNames").remove();
         
-        var allPieces = this.engine.getAllPieces();
         
         var cir = this.svg.selectAll("circle")
                     .data(allPieces);
@@ -243,12 +242,15 @@ XiangqiView.prototype = {
         this.svg.selectAll("text.QiNames").call(drag);
     },
     
-	showscript: function(container) {
+	showAllScripts: function(scripts) {
 		var self=this;
-		var con=d3.select(container);
-		con.selectAll("p").remove();
-		var pp=con.selectAll("p").data(this.engine.data.moves);
-		pp.enter().append("p").html(function (d) {return self.engine.moveToScript(d);}); 
+        
+		this.qipuBox
+            .selectAll("p")
+            .data(scripts)
+            .enter()
+            .append("p")
+            .html(function (d) {return d;}); 
 	},
     
 };

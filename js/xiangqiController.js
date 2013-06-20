@@ -15,7 +15,7 @@ XiangqiController.prototype = {
         // 初始化游戏
         this.view.drawBoard();
         this.engine.init();
-        this.view.drawPieces();
+        this.view.drawPieces(this.engine.getAllPieces());
         // TODO: Event listener
         this.view.d3MouseEvent();
     },
@@ -23,8 +23,9 @@ XiangqiController.prototype = {
 	undo: function() {
         // 处理撤销
 		this.engine.undoMove();
-		this.view.drawPieces();
+		this.view.drawPieces(this.engine.getAllPieces());
 		this.view.d3MouseEvent();
+        this.showAllScripts();
 	},
 	
     moveStart: function(pos) {
@@ -56,17 +57,23 @@ XiangqiController.prototype = {
             if (tos[i][0]==to[0] && tos[i][1]==to[1]) {
                 // Available
                 this.engine.newMove(from, to, this.engine.data.board[from[0]+from[1]*9].name, this.currentPlayer);
-                this.view.drawPieces();
+                this.view.drawPieces(this.engine.getAllPieces());
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 
                 // 下一步更换player, (注：此为游戏逻辑)
                 this.currentPlayer = (this.currentPlayer==0)? 1 : 0;
+                
+                this.showAllScripts();
                 
                 return true;
             }
         }
         this.view.clearEatingPosition();
         this.view.clearPossiblePosition();
-        
-    }
+    },
+    
+    showAllScripts: function() {
+        var scripts = this.engine.data.moves.map(this.engine.moveToScript);
+        this.view.showAllScripts(scripts);
+    },
 };

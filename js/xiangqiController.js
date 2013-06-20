@@ -36,7 +36,7 @@ XiangqiController.prototype = {
         var tos=this.engine.canMove(pos, player, this.engine.data.board);
         if (tos.length) {
             for (var i=0; i<tos.length; i++) {
-                if (this.data.board[tos[i][0]+tos[i][1]*9]==null) {
+                if (this.engine.data.board[tos[i][0]+tos[i][1]*9]==null) {
                     this.view.drawPossiblePosition(tos[i]);
                 } else {
                     this.view.drawEatingPosition(tos[i]);
@@ -55,7 +55,7 @@ XiangqiController.prototype = {
         for (var i=0; i<tos.length; i++) {
             if (tos[i][0]==to[0] && tos[i][1]==to[1]) {
                 // Available
-                this.engine.newMove(from, to, this.data.board[from[0]+from[1]*9].name, this.currentPlayer);
+                this.engine.newMove(from, to, this.engine.data.board[from[0]+from[1]*9].name, this.currentPlayer);
                 this.view.drawPieces();
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 

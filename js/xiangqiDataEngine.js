@@ -100,7 +100,7 @@ XiangqiEngine.prototype = {
             return null;
         } else {
             var move = this.data.cachedMoves.pop();
-			this.newMove(move.from, move.to, move.name, move.player, false);
+			this.newMove(move.from, move.to, move.name, move.player, true);
             return move;
 		}
     },

@@ -238,12 +238,14 @@ XiangqiView.prototype = {
     showAllScripts: function(scripts) {
         var self=this;
         
-        this.qipuBox
+        var newQipu = this.qipuBox
             .selectAll("p")
-            .data(scripts)
-            .enter()
+            .data(scripts);
+        newQipu.enter()
             .append("p")
-            .html(function (d) {return d;}); 
+            .html(function (d) {return d;});
+        newQipu.exit()
+            .remove();
     },
     
 };

@@ -22,10 +22,23 @@ XiangqiController.prototype = {
 	
 	undo: function() {
         // 处理撤销
-		this.engine.undoMove();
-		this.view.drawPieces(this.engine.getAllPieces());
-		this.view.d3MouseEvent();
-        this.showAllScripts();
+		var move = this.engine.undoMove();
+        if (move) {
+            this.currentPlayer = move.player;
+            this.view.drawPieces(this.engine.getAllPieces());
+            this.view.d3MouseEvent();
+            this.showAllScripts();
+        }
+	},
+	redo: function() {
+        // 处理恢复
+		var move = this.engine.redoMove();
+        if (move) {
+            this.currentPlayer = (move.player==0)? 1 : 0;
+            this.view.drawPieces(this.engine.getAllPieces());
+            this.view.d3MouseEvent();
+            this.showAllScripts();
+        }
 	},
 	
     moveStart: function(pos) {

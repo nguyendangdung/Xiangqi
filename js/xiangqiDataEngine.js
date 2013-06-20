@@ -33,7 +33,7 @@ function XiangqiData() {
         //    player: 0, // moved by player 0
         //}, ...
     ]; 
-    this.cachedMoves= []; // 缓存的棋谱？
+    this.cachedMoves= []; // 缓存的棋谱
 }
 //XiangqiData.prototype = {
 //    // 这里添加各种data相关的函数
@@ -115,7 +115,7 @@ XiangqiEngine.prototype = {
     },
     
     
-    newMove: function(from, to, name, player) {
+    newMove: function(from, to, name, player, keepCache) {
         // 新一步
         // TODO: 此为临时代码
         var eaten = this.data.board[to[0]+to[1]*9];
@@ -128,20 +128,41 @@ XiangqiEngine.prototype = {
             eaten:  eaten,
             player: player,
         });
+        if (!keepCache) {
+            this.data.cachedMoves.length = 0;
+        }
     },
     undoMove: function() {
         // 撤销一步
-		// 临时代码，to do
-		var l=this.data.moves.length;
-		if (l==0) {alert("Can not undo further.");}
-		else {
-			var move=this.data.moves[this.data.moves.length-1];
-			this.data.board[move.from[0]+move.from[1]*9] = {name:move.name, player:move.player};
+        // 返回该步
+		if (this.data.moves.length==0) {
+            alert("Can not undo further.");
+            return null;
+        } else {
+            var move = this.data.moves.pop();
+			this.data.board[move.from[0]+move.from[1]*9] = {
+                name: move.name,
+                player: move.player
+            };
 			this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
-			this.data.moves=this.data.moves.slice(0,this.data.moves.length-1);
-			move=this.data.moves;
+            
+            this.data.cachedMoves.push(move);
+            return move;
 		}
     },
+    redoMove: function() {
+        // 恢复一步
+        // 返回该步
+		if (this.data.cachedMoves.length==0) {
+            alert("Can not redo further.");
+            return null;
+        } else {
+            var move = this.data.cachedMoves.pop();
+			this.newMove(move.from, move.to, move.name, move.player, false);
+            return move;
+		}
+    },
+    
     canMove: function(from, player, board) {
         // 是否合法
 		// return all the possible "to"s

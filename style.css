@@ -24,7 +24,10 @@ body {
 .QiNames {
   font-size: 30px;
   text-anchor: "middle";
-  cursor:default;
+}
+
+.qizis {
+  cursor: pointer;
 }
 
 circle.possible-position {
@@ -32,13 +35,18 @@ circle.possible-position {
   stroke-width: 3px;
   fill-opacity: 0;
 }
-circle.QiZi.eating-position {
+.eating-position circle {
   stroke: blue;
   stroke-width: 3px;
 }
 
 .dragging-ghost {
   opacity: 0.3;
+  cursor: pointer;
+}
+
+.not-allowed,  .not-allowed *{
+  cursor: not-allowed!important;
 }
 
 

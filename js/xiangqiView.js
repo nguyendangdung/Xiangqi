@@ -7,7 +7,7 @@ function XiangqiView(container, width, height, qipuBox) {
     //width,height,pad,ra分别为棋盘长、宽、边距、棋子大小 
     this.width = width || 500;
     this.height = height || 500;
-    this.pad = 80;
+    this.pad = 40;
     this.ra = 25;
     this.controller = null; //reference to XiangqiController;
     
@@ -15,8 +15,8 @@ function XiangqiView(container, width, height, qipuBox) {
     this.gridToY = d3.scale.linear().domain([0, 9]).range([this.height,0]);
     
     this.svg = this.container.append("svg")
-        .attr("height", this.height + this.pad)
-        .attr("width",  this.width + this.pad);
+        .attr("height", this.height + this.pad*2)
+        .attr("width",  this.width + this.pad*2);
 }
 
 XiangqiView.prototype = {
@@ -28,9 +28,8 @@ XiangqiView.prototype = {
         var gridToX = this.gridToX,
             gridToY = this.gridToY;
         
-        var rules = this.svg.append("svg:g")
-            .attr("transform", "translate(40,40)")
-            .append("svg:g").classed("rules", true);
+        var rules = this.svg.append("svg:g").classed("rules", true)
+            .attr("transform", "translate("+ this.pad +","+ this.pad +")");
         
         function make_x_axis() {
           return d3.svg.axis()
@@ -87,12 +86,14 @@ XiangqiView.prototype = {
                  .attr("d", line);
                  
         var text = rules.append("svg:g").selectAll("text")
-                .data(datatext);
+                .data(datatext); // 楚河汉界
 
         text.enter().append("text")
             .attr("x", function(d) {return gridToX(d.x);})
             .attr("y", function(d) {return gridToY(d.y);})
-            .attr("transform", "translate(" + "-40" + "," + 15 + ")")
+            .attr("text-anchor", "middle")          // horizontally middle
+            .attr("dominant-baseline", "middle")    // vertically middle
+            //.attr("transform", "translate(" + "-40" + "," + 15 + ")")
             .text(function(d) { return d.name; })
             .style("font-size", "40px");
         
@@ -105,39 +106,31 @@ XiangqiView.prototype = {
         // 画棋子，会清空原有棋子
         var self = this; // 内部函数中的this用self代替
         
-        this.svg.selectAll("circle").remove();
-        this.svg.selectAll(".QiNames").remove();
+        this.svg.selectAll("g.qizis").remove();
         
+        var qizis = this.svg
+            .append("svg:g").classed("qizis", true)
+            .attr("transform", "translate("+ this.pad +","+ this.pad +")")
+            .selectAll("g")
+            .data(allPieces)
+            .enter().append("svg:g")
+            .attr("id", function(d) {return "qizi-"+d.pos[0]+"-"+d.pos[1]});
+            // Each qizi is a <g> element
         
-        var cir = this.svg.selectAll("circle")
-                    .data(allPieces);
-        
-        
-        cir.enter()
-            .append("circle")
-            .attr("class", "QiZi")
-            //.attr("id", function(d) {return "c" + d.id.toString();})
-            .attr("id", function(d) {return "qizi-"+d.pos[0]+"-"+d.pos[1]})
+        qizis.append("circle").attr("class", "QiZi")
             .attr("cx", function(d) {return self.gridToX(d.pos[0]);})
             .attr("cy", function(d) {return self.gridToY(d.pos[1]);})
             .attr("r", this.ra)
             .style("fill", function(d) {return (d.player==0)?"red":"grey";})
-            .style("opacity", 0.5)
-            .attr("transform", "translate(" + 40 + "," + 40 + ")")
-            //.call(drag);
-        
-        var text = this.svg.append("svg:g").selectAll("g")
-            .data(allPieces)
-            .enter().append("svg:g");
-        text.append("svg:text")
+            .style("opacity", 0.5);
+        qizis.append("text")
             .attr("class", "QiNames")
-            //.attr("id", function(d) {return "t" + d.id.toString();})
-            .attr("id", function(d) {return "qiname-"+d.pos[0]+"-"+d.pos[1]})
             .attr("x", function(d) {return self.gridToX(d.pos[0]);})
             .attr("y", function(d) {return self.gridToY(d.pos[1]);})
-            .attr("transform", "translate(" + 25 + "," + 50 + ")")
+            .attr("text-anchor", "middle")          // horizontally middle
+            .attr("dominant-baseline", "middle")    // vertically middle
             .text(function(d) { return d.name; })
-            //.call(drag);
+        
     },
     
     drawCircle: function(pos, clazz) {
@@ -190,23 +183,23 @@ XiangqiView.prototype = {
             
             if (d.dragStarted) {
                 // 绘制ghost棋子
-                var ghost = self.svg.append("svg:g").attr("class", "dragging-ghost");
+                var ghost = self.svg.append("svg:g").attr("class", "dragging-ghost")
+                    .attr("transform", "translate("+ self.pad +","+ self.pad +")");
                 ghost.append("circle")
                     .attr("class", "QiZi")
                     .attr("cx", self.gridToX(d.pos[0]))
                     .attr("cy", self.gridToY(d.pos[1]))
                     .attr("r", self.ra)
-                    .style("fill", (d.player==0)?"red":"grey")
-                    .style("opacity", 0.5)
-                    .attr("transform", "translate(" + 40 + "," + 40 + ")");
+                    .style("fill", (d.player==0)?"red":"grey");
                 ghost.append("svg:text")
                     .attr("class", "QiNames")
                     .attr("x", self.gridToX(d.pos[0]))
                     .attr("y", self.gridToY(d.pos[1]))
-                    .attr("transform", "translate(" + 25 + "," + 50 + ")")
+                    .attr("text-anchor", "middle")          // horizontally middle
+                    .attr("dominant-baseline", "middle")    // vertically middle
                     .text(d.name);
             } else {
-                document.body.style.cursor = "not-allowed";
+                d3.select(document.body).classed("not-allowed", true);
             }
         }
         
@@ -234,7 +227,7 @@ XiangqiView.prototype = {
                 ];
                 self.controller.moveEnd(d.pos, pos);
             } else {
-                document.body.style.cursor = null;
+                d3.select(document.body).classed("not-allowed", false);
             }
         }
         

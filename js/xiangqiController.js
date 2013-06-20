@@ -72,6 +72,8 @@ XiangqiController.prototype = {
                 this.engine.newMove(from, to, this.engine.data.board[from[0]+from[1]*9].name, this.currentPlayer);
                 this.view.drawPieces(this.engine.getAllPieces());
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
+                this.view.clearEatingPosition();
+                this.view.clearPossiblePosition();
                 
                 // 下一步更换player, (注：此为游戏逻辑)
                 this.currentPlayer = (this.currentPlayer==0)? 1 : 0;

@@ -3,13 +3,13 @@
   <head>
     <title>你问我答象棋社区</title>
     <script type="text/javascript" src="lib/d3.v2.min.js"></script>
-	<script type="text/javascript" src="lib/jstat.min.js"></script>
-	<script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>	
+    <script type="text/javascript" src="lib/jstat.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>  
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-	<h2>你问我答象棋社区</h2>
-	<p>这里是欢乐的象棋问答社区，在这里你可以自由的上传对局，听他人评头论足，也可以欣赏大师精彩对局，听网友们分析大师的意图。快来试试吧</p>
+    <h2>你问我答象棋社区</h2>
+    <p>这里是欢乐的象棋问答社区，在这里你可以自由的上传对局，听他人评头论足，也可以欣赏大师精彩对局，听网友们分析大师的意图。快来试试吧</p>
     <script type="text/javascript" charset="gb2312">
  
 //w,h,pad,ra分别为棋盘长、宽、边距、棋子大小 
@@ -20,338 +20,338 @@ var ra = 25;
 var x = d3.scale.linear().domain([0, 8]).range([0,w]);
 var y = d3.scale.linear().domain([0, 9])  .range([h,0]);
 var Xiangqi = [
-			   {name: "车", pos: [0, 0], col:"red"},
-			   {name: "马", pos: [1, 0], col:"red"},
-			   {name: "相", pos: [2, 0], col:"red"},
-			   {name: "仕", pos: [3, 0], col:"red"},
-			   {name: "帅", pos: [4, 0], col:"red"},			   
-			   {name: "仕", pos: [5, 0], col:"red"},			   
-			   {name: "相", pos: [6, 0], col:"red"},			   
-			   {name: "马", pos: [7, 0], col:"red"},			   
-			   {name: "车", pos: [8, 0], col:"red"},
-			   {name: "炮", pos: [1, 2], col:"red"},
-			   {name: "炮", pos: [7, 2], col:"red"},
-			   {name: "兵", pos: [0, 3], col:"red"},
-			   {name: "兵", pos: [2, 3], col:"red"},
-			   {name: "兵", pos: [4, 3], col:"red"},
-			   {name: "兵", pos: [6, 3], col:"red"},
-			   {name: "兵", pos: [8, 3], col:"red"},
-			   {name: "车", pos: [0, 9], col:"grey"},
-			   {name: "马", pos: [1, 9], col:"grey"},
-			   {name: "象", pos: [2, 9], col:"grey"},
-			   {name: "士", pos: [3, 9], col:"grey"},
-			   {name: "将", pos: [4, 9], col:"grey"},			   
-			   {name: "士", pos: [5, 9], col:"grey"},			   
-			   {name: "象", pos: [6, 9], col:"grey"},			   
-			   {name: "马", pos: [7, 9], col:"grey"},			   
-			   {name: "车", pos: [8, 9], col:"grey"},
-			   {name: "炮", pos: [1, 7], col:"grey"},
-			   {name: "炮", pos: [7, 7], col:"grey"},
-			   {name: "卒", pos: [0, 6], col:"grey"},
-			   {name: "卒", pos: [2, 6], col:"grey"},
-			   {name: "卒", pos: [4, 6], col:"grey"},
-			   {name: "卒", pos: [6, 6], col:"grey"},
-			   {name: "卒", pos: [8, 6], col:"grey"}
-			  ];
+               {name: "车", pos: [0, 0], col:"red"},
+               {name: "马", pos: [1, 0], col:"red"},
+               {name: "相", pos: [2, 0], col:"red"},
+               {name: "仕", pos: [3, 0], col:"red"},
+               {name: "帅", pos: [4, 0], col:"red"},              
+               {name: "仕", pos: [5, 0], col:"red"},              
+               {name: "相", pos: [6, 0], col:"red"},              
+               {name: "马", pos: [7, 0], col:"red"},              
+               {name: "车", pos: [8, 0], col:"red"},
+               {name: "炮", pos: [1, 2], col:"red"},
+               {name: "炮", pos: [7, 2], col:"red"},
+               {name: "兵", pos: [0, 3], col:"red"},
+               {name: "兵", pos: [2, 3], col:"red"},
+               {name: "兵", pos: [4, 3], col:"red"},
+               {name: "兵", pos: [6, 3], col:"red"},
+               {name: "兵", pos: [8, 3], col:"red"},
+               {name: "车", pos: [0, 9], col:"grey"},
+               {name: "马", pos: [1, 9], col:"grey"},
+               {name: "象", pos: [2, 9], col:"grey"},
+               {name: "士", pos: [3, 9], col:"grey"},
+               {name: "将", pos: [4, 9], col:"grey"},             
+               {name: "士", pos: [5, 9], col:"grey"},             
+               {name: "象", pos: [6, 9], col:"grey"},             
+               {name: "马", pos: [7, 9], col:"grey"},             
+               {name: "车", pos: [8, 9], col:"grey"},
+               {name: "炮", pos: [1, 7], col:"grey"},
+               {name: "炮", pos: [7, 7], col:"grey"},
+               {name: "卒", pos: [0, 6], col:"grey"},
+               {name: "卒", pos: [2, 6], col:"grey"},
+               {name: "卒", pos: [4, 6], col:"grey"},
+               {name: "卒", pos: [6, 6], col:"grey"},
+               {name: "卒", pos: [8, 6], col:"grey"}
+              ];
 //为每个棋子添加id方便查找
 Xiangqi = jStat.seq(0, Xiangqi.length-1, Xiangqi.length).map(function (ii) {
-					return {name: Xiangqi[ii].name, pos: Xiangqi[ii].pos, col:Xiangqi[ii].col, id:ii};
-				});
+                    return {name: Xiangqi[ii].name, pos: Xiangqi[ii].pos, col:Xiangqi[ii].col, id:ii};
+                });
 //Chscr用于棋谱显示
 var Chscr = ["九","八","七","六","五","四","三","二","一"];
 
 //init 产生空棋盘（网格线及楚河汉界）
 function init(container, w, h, data) {
-	var con = d3.select("#" + container);
-	con.append("h2").html(data.title);	
+    var con = d3.select("#" + container);
+    con.append("h2").html(data.title);  
 
-	var svg = con.append("svg")
-		.attr("height", h + pad)
-		.attr("width",  w + pad)
+    var svg = con.append("svg")
+        .attr("height", h + pad)
+        .attr("width",  w + pad)
  
-	var vis = svg.append("svg:g")
-		.attr("transform", "translate(40,40)")
+    var vis = svg.append("svg:g")
+        .attr("transform", "translate(40,40)")
  
-	var rules = vis.append("svg:g").classed("rules", true)
+    var rules = vis.append("svg:g").classed("rules", true)
  
-	function make_x_axis() {
-	  return d3.svg.axis()
-		  .scale(x)
-		  .orient("bottom")
-		  .ticks(9)
-	}
+    function make_x_axis() {
+      return d3.svg.axis()
+          .scale(x)
+          .orient("bottom")
+          .ticks(9)
+    }
  
-	function make_y_axis() {
-	  return d3.svg.axis()
-		  .scale(y)
-		  .orient("left")
-	}
+    function make_y_axis() {
+      return d3.svg.axis()
+          .scale(y)
+          .orient("left")
+    }
  
- 	rules.append("svg:g").classed("grid y_grid", true)
-		.call(make_y_axis()
-		  .tickSize(-w,0,0)
-		  .tickFormat("")
-		)
-	
-	var line = d3.svg.line()
-		.x(function(d, i) { return x(d.x); })
-		.y(function(d, i) { return y(d.y); });
-		
-	var dataInitlines = [
-					 [{x:3, y:2}, {x:5, y:0}],
+    rules.append("svg:g").classed("grid y_grid", true)
+        .call(make_y_axis()
+          .tickSize(-w,0,0)
+          .tickFormat("")
+        )
+    
+    var line = d3.svg.line()
+        .x(function(d, i) { return x(d.x); })
+        .y(function(d, i) { return y(d.y); });
+        
+    var dataInitlines = [
+                     [{x:3, y:2}, {x:5, y:0}],
                      [{x:3, y:0}, {x:5, y:2}],
-					 [{x:3, y:9}, {x:5, y:7}],
+                     [{x:3, y:9}, {x:5, y:7}],
                      [{x:3, y:7}, {x:5, y:9}],
-					 [{x:0, y:0}, {x:0, y:9}],
-					 [{x:8, y:0}, {x:8, y:9}],	
-					 [{x:1, y:0}, {x:1, y:4}],	
-					 [{x:1, y:5}, {x:1, y:9}],	
-					 [{x:2, y:0}, {x:2, y:4}],	
-					 [{x:2, y:5}, {x:2, y:9}],
-					 [{x:3, y:0}, {x:3, y:4}],	
-					 [{x:3, y:5}, {x:3, y:9}],
-					 [{x:4, y:0}, {x:4, y:4}],	
-					 [{x:4, y:5}, {x:4, y:9}],
-					 [{x:5, y:0}, {x:5, y:4}],	
-					 [{x:5, y:5}, {x:5, y:9}],
-					 [{x:6, y:0}, {x:6, y:4}],	
-					 [{x:6, y:5}, {x:6, y:9}],
-					 [{x:7, y:0}, {x:7, y:4}],	
-					 [{x:7, y:5}, {x:7, y:9}]					 
-					];
-	var datatext = [{name:"楚河", x:2, y:4.5},
-					{name:"汉界", x:6, y:4.5}];
-	
-	var initlines = rules.append("svg:g")
-					.selectAll("path")
-					.data(dataInitlines);
-	initlines.enter().append("path")
-			 .attr("d", line);
-			 
-	var text = rules.append("svg:g").selectAll("text")
-			.data(datatext);
+                     [{x:0, y:0}, {x:0, y:9}],
+                     [{x:8, y:0}, {x:8, y:9}],  
+                     [{x:1, y:0}, {x:1, y:4}],  
+                     [{x:1, y:5}, {x:1, y:9}],  
+                     [{x:2, y:0}, {x:2, y:4}],  
+                     [{x:2, y:5}, {x:2, y:9}],
+                     [{x:3, y:0}, {x:3, y:4}],  
+                     [{x:3, y:5}, {x:3, y:9}],
+                     [{x:4, y:0}, {x:4, y:4}],  
+                     [{x:4, y:5}, {x:4, y:9}],
+                     [{x:5, y:0}, {x:5, y:4}],  
+                     [{x:5, y:5}, {x:5, y:9}],
+                     [{x:6, y:0}, {x:6, y:4}],  
+                     [{x:6, y:5}, {x:6, y:9}],
+                     [{x:7, y:0}, {x:7, y:4}],  
+                     [{x:7, y:5}, {x:7, y:9}]                    
+                    ];
+    var datatext = [{name:"楚河", x:2, y:4.5},
+                    {name:"汉界", x:6, y:4.5}];
+    
+    var initlines = rules.append("svg:g")
+                    .selectAll("path")
+                    .data(dataInitlines);
+    initlines.enter().append("path")
+             .attr("d", line);
+             
+    var text = rules.append("svg:g").selectAll("text")
+            .data(datatext);
 
-	text.enter().append("text")
-		.attr("x", function(d) {return x(d.x);})
-		.attr("y", function(d) {return y(d.y);})
-		.attr("transform", "translate(" + "-40" + "," + 15 + ")")
-		.text(function(d) { return d.name; })
-		.style("font-size", "40px");
-		
-	d3.select("#" + container)
-	  .append("div")
+    text.enter().append("text")
+        .attr("x", function(d) {return x(d.x);})
+        .attr("y", function(d) {return y(d.y);})
+        .attr("transform", "translate(" + "-40" + "," + 15 + ")")
+        .text(function(d) { return d.name; })
+        .style("font-size", "40px");
+        
+    d3.select("#" + container)
+      .append("div")
       .attr("class","ivcont script");
-	  
-	var leg = con.append("div")
-				 .attr("class", "userviscontrols");
-	var buttondata = [
-						{ type : "submit", value : "下一步", fn : OneMove },
-						{ type : "submit", value : "回到起始位置", fn : initQiPan },
-						{ type : "submit", value : "拆解本步", fn : copyQiPan }
-					 ];
-	var buttons = leg.selectAll(".button")
-					 .data(buttondata);
-	buttons.enter().append("input").attr("class", "button")
-		   .attr("type", function (d) {return d.type;})
-		   .attr("value", function (d) {return d.value;});
-		   //.on("click", function (d) {return d.fn(obj);});
+      
+    var leg = con.append("div")
+                 .attr("class", "userviscontrols");
+    var buttondata = [
+                        { type : "submit", value : "下一步", fn : OneMove },
+                        { type : "submit", value : "回到起始位置", fn : initQiPan },
+                        { type : "submit", value : "拆解本步", fn : copyQiPan }
+                     ];
+    var buttons = leg.selectAll(".button")
+                     .data(buttondata);
+    buttons.enter().append("input").attr("class", "button")
+           .attr("type", function (d) {return d.type;})
+           .attr("value", function (d) {return d.value;});
+           //.on("click", function (d) {return d.fn(obj);});
 
-/*	
-	rules.append("svg:g").classed("grid x_grid", true)
-		.attr("transform", "translate(0,"+ h +")")
-		.call(make_x_axis()
-		  .tickSize(-h,0,0)
-		  .tickFormat("")
-		);
- 	
-	rules.append("svg:g").classed("labels x_labels", true)
-		.attr("transform", "translate(0,"+h+")")
-		.call(make_x_axis()
-		  .tickSize(5)
-		)
-	 
-	rules.append("svg:g").classed("labels y_labels", true)
-		.call(make_y_axis()
-		.tickSubdivide(1)
-		.tickSize(10, 5, 0)
-		)
-	*/
-	
-	return {con : con, svg : svg, 
-			data : data, x : x, y : y};
+/*  
+    rules.append("svg:g").classed("grid x_grid", true)
+        .attr("transform", "translate(0,"+ h +")")
+        .call(make_x_axis()
+          .tickSize(-h,0,0)
+          .tickFormat("")
+        );
+    
+    rules.append("svg:g").classed("labels x_labels", true)
+        .attr("transform", "translate(0,"+h+")")
+        .call(make_x_axis()
+          .tickSize(5)
+        )
+     
+    rules.append("svg:g").classed("labels y_labels", true)
+        .call(make_y_axis()
+        .tickSubdivide(1)
+        .tickSize(10, 5, 0)
+        )
+    */
+    
+    return {con : con, svg : svg, 
+            data : data, x : x, y : y};
 }
 
 //initQiPan根据data.init布置棋子，设置标题，以及添加基本的按钮
 function initQiPan(obj) {
-	obj.con.select("h2").html(obj.data.title);
-	/*if (obj.data.currentStep == 0) {
-		obj.svg.selectAll("circle").remove();
-		obj.svg.selectAll(".QiNames").remove();
-		//obj.leg.select("button").remove();
-	} */
-	obj.data.currentStep = 0;
-	obj.svg.selectAll("circle").remove();
-	obj.svg.selectAll(".QiNames").remove();
+    obj.con.select("h2").html(obj.data.title);
+    /*if (obj.data.currentStep == 0) {
+        obj.svg.selectAll("circle").remove();
+        obj.svg.selectAll(".QiNames").remove();
+        //obj.leg.select("button").remove();
+    } */
+    obj.data.currentStep = 0;
+    obj.svg.selectAll("circle").remove();
+    obj.svg.selectAll(".QiNames").remove();
 
-	//add attribute x,y to function the "drag"
-	for (var ii = 0; ii < obj.data.init.length; ii++) {
-		obj.data.init[ii].x = obj.x(obj.data.init[ii].pos[0]);
-		obj.data.init[ii].y = obj.y(obj.data.init[ii].pos[1]);
-	}
-	obj.data.currentQipan = jQuery.extend(true, [], obj.data.init);
-	
-	var cir=obj.svg.selectAll("circle")
-				.data(obj.data.init.filter( function (el)
-												{
-												  return el.pos[0] >= 0;
-												}));
-	cir.enter()
-		.append("circle")
-		.attr("class", "QiZi")
-		.attr("id", function(d) {return "c" + d.id.toString();})
-		.attr("cx", function(d) {return obj.x(d.pos[0]);})
-		.attr("cy", function(d) {return obj.y(d.pos[1]);})
-		.attr("r", ra)
-		.style("fill", function(d) {return d.col;})
-		.style("opacity", 0.5)
-		.attr("transform", "translate(" + 40 + "," + 40 + ")")
-		.call(drag);
+    //add attribute x,y to function the "drag"
+    for (var ii = 0; ii < obj.data.init.length; ii++) {
+        obj.data.init[ii].x = obj.x(obj.data.init[ii].pos[0]);
+        obj.data.init[ii].y = obj.y(obj.data.init[ii].pos[1]);
+    }
+    obj.data.currentQipan = jQuery.extend(true, [], obj.data.init);
+    
+    var cir=obj.svg.selectAll("circle")
+                .data(obj.data.init.filter( function (el)
+                                                {
+                                                  return el.pos[0] >= 0;
+                                                }));
+    cir.enter()
+        .append("circle")
+        .attr("class", "QiZi")
+        .attr("id", function(d) {return "c" + d.id.toString();})
+        .attr("cx", function(d) {return obj.x(d.pos[0]);})
+        .attr("cy", function(d) {return obj.y(d.pos[1]);})
+        .attr("r", ra)
+        .style("fill", function(d) {return d.col;})
+        .style("opacity", 0.5)
+        .attr("transform", "translate(" + 40 + "," + 40 + ")")
+        .call(drag);
 
-	var text = obj.svg.append("svg:g").selectAll("g")
-				.data(obj.data.init.filter( function (el)
-												{
-												  return el.pos[0] >= 0;
-												}))
-				.enter().append("svg:g");
+    var text = obj.svg.append("svg:g").selectAll("g")
+                .data(obj.data.init.filter( function (el)
+                                                {
+                                                  return el.pos[0] >= 0;
+                                                }))
+                .enter().append("svg:g");
 
-	text.append("svg:text")
-		.attr("class", "QiNames")
-		.attr("id", function(d) {return "t" + d.id.toString();})
-		.attr("x", function(d) {return obj.x(d.pos[0]);})
-		.attr("y", function(d) {return obj.y(d.pos[1]);})
-		.attr("transform", "translate(" + 25 + "," + 50 + ")")
-		.text(function(d) { return d.name; })
-		.call(drag);
-	
-	//添加文字棋谱
-	qipuToScript(obj.data,".ivcont .script");
+    text.append("svg:text")
+        .attr("class", "QiNames")
+        .attr("id", function(d) {return "t" + d.id.toString();})
+        .attr("x", function(d) {return obj.x(d.pos[0]);})
+        .attr("y", function(d) {return obj.y(d.pos[1]);})
+        .attr("transform", "translate(" + 25 + "," + 50 + ")")
+        .text(function(d) { return d.name; })
+        .call(drag);
+    
+    //添加文字棋谱
+    qipuToScript(obj.data,".ivcont .script");
 
-	//关联button的function
-	obj.con.selectAll(".button")
-	   .on("click", function (d) {return d.fn(obj);});
+    //关联button的function
+    obj.con.selectAll(".button")
+       .on("click", function (d) {return d.fn(obj);});
 
  }
 //供测试用棋谱
 var testqipu = {title : "韩 vs 秦 5/4/2013",
-			binit : "0919293949596979891777062646668600102030405060708012720323436383",
-			movelist : "774770627967636489795041192712422625102227354252797380820908604273637270355462505433000117375062474322436343706029476254434454660878826237366465335462644765646578705250547365637071013173615051366663664454405061734132674866637381504071513241816063604645606545446535482735255457313659483626577741505157268669878626444325454353304153632324636224256261266661512526271966607776452519072627072627287646607026452838453370794859383949392529393879785948292838397879485979754636413251504041335428293938757859482928383928225462413150407871361622211612"
-		   };
+            binit : "0919293949596979891777062646668600102030405060708012720323436383",
+            movelist : "774770627967636489795041192712422625102227354252797380820908604273637270355462505433000117375062474322436343706029476254434454660878826237366465335462644765646578705250547365637071013173615051366663664454405061734132674866637381504071513241816063604645606545446535482735255457313659483626577741505157268669878626444325454353304153632324636224256261266661512526271966607776452519072627072627287646607026452838453370794859383949392529393879785948292838397879485979754636413251504041335428293938757859482928383928225462413150407871361622211612"
+           };
 var testqipu2 = {title : "车马炮 vs 兵双步",
-			binit : "0919293949596979891777062646668699992030405060999999990323436383",
-			movelist : "7747"
-		   };
+            binit : "0919293949596979891777062646668699992030405060999999990323436383",
+            movelist : "7747"
+           };
 
 var QiPuOrig1 = "7747706279678070897910222625636479737282736382814645304145448161635364656746707846347818090743443422000217371219532320423733181222431916436216263332262332021202071723293948422062546555698761641727290925240212493920422434444554331219393864613444191838391816666509594443161939385958485961714777191838391816272345464342604233217121232146477770426021204130203040413031414239495888"
 var QiPuOrig2 = "7747706266658070796723248979102217132042192722341363727609190010191434261413263465645041133334267977426467552647694712162735766677706663556362703543604263711015433516863383153583863575";
 
 //readQipu把网络格式转化成本地格式
 function readQipu(dat) {
-	if (dat.binit.length != 2*Xiangqi.length) alert("错误的开始布局");
-	else {
-		var tmp = Object();
-		tmp.init = jQuery.extend(true, [], Xiangqi);
-		for (var ii = 0; ii < tmp.init.length; ii++) {
-			if (dat.binit[ii*2] == 9) tmp.init[ii].pos = [-1,-1];
-			else tmp.init[ii].pos = [dat.binit[ii*2], 9-dat.binit[ii*2+1]];
-		}
-		tmp.currentStep = 0;
-		tmp.currentQipan = jQuery.extend(true, [], tmp.init);
-		tmp.title = dat.title;
-		if (dat.movelist.length % 4 != 0) alert("错误的棋谱");
-		else {
-			tmp.Qipu = jStat.seq(1, dat.movelist.length/4, dat.movelist.length/4).map(function(i) {
-						return [
-								[dat.movelist[(i-1)*4], 9-dat.movelist[(i-1)*4+1]],
-								[dat.movelist[(i-1)*4+2], 9-dat.movelist[(i-1)*4+3]]
-							   ];});
-			return tmp;
-		}
-	}
+    if (dat.binit.length != 2*Xiangqi.length) alert("错误的开始布局");
+    else {
+        var tmp = Object();
+        tmp.init = jQuery.extend(true, [], Xiangqi);
+        for (var ii = 0; ii < tmp.init.length; ii++) {
+            if (dat.binit[ii*2] == 9) tmp.init[ii].pos = [-1,-1];
+            else tmp.init[ii].pos = [dat.binit[ii*2], 9-dat.binit[ii*2+1]];
+        }
+        tmp.currentStep = 0;
+        tmp.currentQipan = jQuery.extend(true, [], tmp.init);
+        tmp.title = dat.title;
+        if (dat.movelist.length % 4 != 0) alert("错误的棋谱");
+        else {
+            tmp.Qipu = jStat.seq(1, dat.movelist.length/4, dat.movelist.length/4).map(function(i) {
+                        return [
+                                [dat.movelist[(i-1)*4], 9-dat.movelist[(i-1)*4+1]],
+                                [dat.movelist[(i-1)*4+2], 9-dat.movelist[(i-1)*4+3]]
+                               ];});
+            return tmp;
+        }
+    }
 }
 
-//OneMove给出了每一步棋的移动视效，同时也更新data				   
+//OneMove给出了每一步棋的移动视效，同时也更新data                
 function OneMove (obj) {
-	if (obj.data.currentStep >= obj.data.Qipu.length) alert("棋谱已演示完"); else {
-		var movefrom = null, moveto = null;
-		var d = obj.data;
-		for (var ii = 0; ii < d.currentQipan.length; ii++) {
-		  var tmp = d.currentQipan[ii].pos;
-		  if (tmp[0] == d.Qipu[d.currentStep][0][0] && tmp[1] == d.Qipu[d.currentStep][0][1]) {
-			movefrom = d.currentQipan[ii];
-			d.currentQipan[ii].pos = d.Qipu[d.currentStep][1];
-		  } else if (tmp[0] == d.Qipu[d.currentStep][1][0] && tmp[1] == d.Qipu[d.currentStep][1][1]) {
-			moveto = d.currentQipan[ii];
-			d.currentQipan[ii].pos = [-1,-1];
-		  }
-		}
-		if (moveto == null) {
-			tmp = movefrom.id.toString();
-			var cirFrom = d3.select("#" + "c" + tmp); 
-			var textFrom = d3.select("#" + "t" +tmp);
+    if (obj.data.currentStep >= obj.data.Qipu.length) alert("棋谱已演示完"); else {
+        var movefrom = null, moveto = null;
+        var d = obj.data;
+        for (var ii = 0; ii < d.currentQipan.length; ii++) {
+          var tmp = d.currentQipan[ii].pos;
+          if (tmp[0] == d.Qipu[d.currentStep][0][0] && tmp[1] == d.Qipu[d.currentStep][0][1]) {
+            movefrom = d.currentQipan[ii];
+            d.currentQipan[ii].pos = d.Qipu[d.currentStep][1];
+          } else if (tmp[0] == d.Qipu[d.currentStep][1][0] && tmp[1] == d.Qipu[d.currentStep][1][1]) {
+            moveto = d.currentQipan[ii];
+            d.currentQipan[ii].pos = [-1,-1];
+          }
+        }
+        if (moveto == null) {
+            tmp = movefrom.id.toString();
+            var cirFrom = d3.select("#" + "c" + tmp); 
+            var textFrom = d3.select("#" + "t" +tmp);
 
-			cirFrom.transition()
-				.duration(1000)
-				.attr("cx", obj.x(d.Qipu[d.currentStep][1][0]))
-				.attr("cy", obj.y(d.Qipu[d.currentStep][1][1]))
-				.style("opacity",0.5);
-			textFrom.transition()
-				.duration(1000)
-				.attr("x", obj.x(d.Qipu[d.currentStep][1][0]))
-				.attr("y", obj.y(d.Qipu[d.currentStep][1][1]));
-		} else {
-			tmp = movefrom.id.toString();
-			var cirFrom = d3.select("#" + "c" + tmp); 
-			var textFrom = d3.select("#" + "t" +tmp);
-			var cirTo = d3.select("#" + "c" + moveto.id.toString());
-			var textTo = d3.select("#" + "t" + moveto.id.toString());
-			
-			cirFrom.transition()
-				.duration(1000)
-				.attr("cx", obj.x(d.Qipu[d.currentStep][1][0]))
-				.attr("cy", obj.y(d.Qipu[d.currentStep][1][1]))
-				.style("opacity",0.5);
-			textFrom.transition()
-				.duration(1000)
-				.attr("x", obj.x(d.Qipu[d.currentStep][1][0]))
-				.attr("y", obj.y(d.Qipu[d.currentStep][1][1]));
-			
-			cirTo.transition().delay(500)
-				.duration(500)
-				.style("opacity",0)
-				.remove();
+            cirFrom.transition()
+                .duration(1000)
+                .attr("cx", obj.x(d.Qipu[d.currentStep][1][0]))
+                .attr("cy", obj.y(d.Qipu[d.currentStep][1][1]))
+                .style("opacity",0.5);
+            textFrom.transition()
+                .duration(1000)
+                .attr("x", obj.x(d.Qipu[d.currentStep][1][0]))
+                .attr("y", obj.y(d.Qipu[d.currentStep][1][1]));
+        } else {
+            tmp = movefrom.id.toString();
+            var cirFrom = d3.select("#" + "c" + tmp); 
+            var textFrom = d3.select("#" + "t" +tmp);
+            var cirTo = d3.select("#" + "c" + moveto.id.toString());
+            var textTo = d3.select("#" + "t" + moveto.id.toString());
+            
+            cirFrom.transition()
+                .duration(1000)
+                .attr("cx", obj.x(d.Qipu[d.currentStep][1][0]))
+                .attr("cy", obj.y(d.Qipu[d.currentStep][1][1]))
+                .style("opacity",0.5);
+            textFrom.transition()
+                .duration(1000)
+                .attr("x", obj.x(d.Qipu[d.currentStep][1][0]))
+                .attr("y", obj.y(d.Qipu[d.currentStep][1][1]));
+            
+            cirTo.transition().delay(500)
+                .duration(500)
+                .style("opacity",0)
+                .remove();
 
-			textTo.transition().delay(500)
-				.duration(500)
-				.style("opacity",0)
-				.remove();	
-		}
-		d.currentStep++;
-		obj.data = d;
-	}
+            textTo.transition().delay(500)
+                .duration(500)
+                .style("opacity",0)
+                .remove();  
+        }
+        d.currentStep++;
+        obj.data = d;
+    }
 }
 
 //copyQiPan复制一个棋盘，需改进
 function copyQiPan (obj) {
-	QiJu2 = d3.select("body")
-			 .append("div")
-			 .attr("class", "ivcont")
-			 .attr("id", "QiPan2");
-	var Xiangqi2 = obj.data.currentQipan.filter( function (el)
-	{
-	  return el.pos[0] >= 0;
-	});
-	QiJu2 = init("QiPan2", w, h, obj.data.title, Xiangqi2);
-	initQiPan(QiJu2);	
+    QiJu2 = d3.select("body")
+             .append("div")
+             .attr("class", "ivcont")
+             .attr("id", "QiPan2");
+    var Xiangqi2 = obj.data.currentQipan.filter( function (el)
+    {
+      return el.pos[0] >= 0;
+    });
+    QiJu2 = init("QiPan2", w, h, obj.data.title, Xiangqi2);
+    initQiPan(QiJu2);   
 }
 
 //棋子拖动
@@ -360,157 +360,157 @@ var drag = d3.behavior.drag()
     //.on("dragstart", dragstart)
     .on("drag", dragmove)
     .on("dragend", dragend);
-	
+    
 function dragmove(d, i) {
-	//javascript的复杂数据对象如数组，object传值时复址，所以会同时改变
-	// Shallow copy
-	//var newObject = jQuery.extend({}, oldObject);
-	// Deep copy
-	//var newObject = jQuery.extend(true, {}, oldObject);
-	d.dragx = d3.round(x.invert(d3.event.x));
-	d.dragy = d3.round(y.invert(d3.event.y));
-	d.x = x(d.dragx);
-	d.y = y(d.dragy);
-	return 0;
+    //javascript的复杂数据对象如数组，object传值时复址，所以会同时改变
+    // Shallow copy
+    //var newObject = jQuery.extend({}, oldObject);
+    // Deep copy
+    //var newObject = jQuery.extend(true, {}, oldObject);
+    d.dragx = d3.round(x.invert(d3.event.x));
+    d.dragy = d3.round(y.invert(d3.event.y));
+    d.x = x(d.dragx);
+    d.y = y(d.dragy);
+    return 0;
 }
 
 function dragend(d) {
-	QiJu.data.Qipu[QiJu.data.currentStep][0]=d.pos;
-	QiJu.data.Qipu[QiJu.data.currentStep][1]=[d.dragx,d.dragy];
-	OneMove(QiJu);
-	//已经到棋盘中止时随便添加一行，为了凑OneMove添加的
-	if (QiJu.data.currentStep >= QiJu.data.Qipu.length) 
-		QiJu.data.Qipu.push([[1,1],[9,9]]);
+    QiJu.data.Qipu[QiJu.data.currentStep][0]=d.pos;
+    QiJu.data.Qipu[QiJu.data.currentStep][1]=[d.dragx,d.dragy];
+    OneMove(QiJu);
+    //已经到棋盘中止时随便添加一行，为了凑OneMove添加的
+    if (QiJu.data.currentStep >= QiJu.data.Qipu.length) 
+        QiJu.data.Qipu.push([[1,1],[9,9]]);
     /*d3.selectAll("#" + "c" + d.id).transition().duration(500)
-					.attr("cx", d.x)
-					.attr("cy", d.y);
-	d3.selectAll("#" + "t" + d.id).transition().duration(500)
-					.attr("x", d.x)
-					.attr("y", d.y);*/
+                    .attr("cx", d.x)
+                    .attr("cy", d.y);
+    d3.selectAll("#" + "t" + d.id).transition().duration(500)
+                    .attr("x", d.x)
+                    .attr("y", d.y);*/
 }
 
 // output the script of Qipu by inputing obj.data
-// 可参考百度知道象棋读谱规则，未涉及复杂的局面如双车并线	
+// 可参考百度知道象棋读谱规则，未涉及复杂的局面如双车并线    
 function qipuToScript(d,container) {
-	var movefrom = null, moveto = null, scriptNum1 = null, scriptNum2 = null,scriptDir = null;
-	var tmpQipan = jQuery.extend(true, [], d.init);
-	var qipuScript = d3.select(container);
-	qipuScript.selectAll("p").remove();
-	/*				   .append("div");
+    var movefrom = null, moveto = null, scriptNum1 = null, scriptNum2 = null,scriptDir = null;
+    var tmpQipan = jQuery.extend(true, [], d.init);
+    var qipuScript = d3.select(container);
+    qipuScript.selectAll("p").remove();
+    /*                 .append("div");
     qipuScript.attr("class","ivcont script");*/
-	for (var jj = 0; jj < d.Qipu.length; jj++) {
-		//console.log(tmpQipan.filter(function (el) { return el.pos == d.Qipu[jj][0];}));
-		for (var ii = 0; ii < tmpQipan.length; ii++) {
-			var tmp = tmpQipan[ii].pos;
-			if (tmp[0] == d.Qipu[jj][0][0] && tmp[1] == d.Qipu[jj][0][1]) {
-				movefrom = tmpQipan[ii];
-				var id = movefrom.id;
-				if (id == 0 || id == 4 || id == 8 || id == 9 || id ==10 || id == 11 || id == 12 || id == 13 || id == 14 || id == 15) {
-					scriptNum1 = Chscr[d.Qipu[jj][0][0]];
-					if (d.Qipu[jj][0][1] > d.Qipu[jj][1][1]) {
-						scriptNum2 = Chscr[9 - d.Qipu[jj][0][1] + d.Qipu[jj][1][1]];
-						scriptDir = "退";
-					} else if (d.Qipu[jj][0][1] < d.Qipu[jj][1][1]) {
-						scriptNum2 = Chscr[9 - d.Qipu[jj][1][1] + d.Qipu[jj][0][1]];
-						scriptDir = "进";
-					} else {
-						scriptNum2 = Chscr[d.Qipu[jj][1][0]];
-						scriptDir = "平";
-					}
-				} else if (id == 1 || id == 2 || id == 3 || id == 5 || id == 6 || id == 7) {
-					scriptNum1 = Chscr[d.Qipu[jj][0][0]];
-					scriptNum2 = Chscr[d.Qipu[jj][1][0]];
-					if (d.Qipu[jj][0][1] > d.Qipu[jj][1][1]) {
-						scriptDir = "退";
-					} else {
-						scriptDir = "进";
-					}			
-				}　else if (id == 16 || id == 20 || id == 24 || id == 25 || id ==26 || id == 27 || id == 28 || id == 29 || id == 30 || id == 31) {
-					scriptNum1 = parseInt(d.Qipu[jj][0][0])+1;
-					if (d.Qipu[jj][0][1] < d.Qipu[jj][1][1]) {
-						scriptNum2 = d.Qipu[jj][1][1] - d.Qipu[jj][0][1];
-						scriptDir = "退";
-					} else if (d.Qipu[jj][0][1] > d.Qipu[jj][1][1]) {
-						scriptNum2 = d.Qipu[jj][0][1] - d.Qipu[jj][1][1];
-						scriptDir = "进";
-					} else {
-						scriptNum2 = parseInt(d.Qipu[jj][1][0])+1;
-						scriptDir = "平";
-					}					
-				}　else {
-					scriptNum1 = parseInt(d.Qipu[jj][0][0])+1;
-					scriptNum2 = parseInt(d.Qipu[jj][1][0])+1;
-					if (d.Qipu[jj][0][1] < d.Qipu[jj][1][1]) {
-						scriptDir = "退";
-					} else {
-						scriptDir = "进";
-					}					
-				}
-				qipuScript.append("p").html(movefrom.name + scriptNum1 + scriptDir + scriptNum2);
-				//image does not work
-				qipuScript.append("svg:image")
-						  .attr("xlink:href", "resource/exclamation-mark.jpg")
-						  .style("width", "15px")
-						  .style("height", "15px");
-				tmpQipan[ii].pos = d.Qipu[jj][1];
-			} else if (tmp[0] == d.Qipu[jj][1][0] && tmp[1] == d.Qipu[jj][1][1]) {
-				moveto = tmpQipan[ii];
-				tmpQipan[ii].pos = [-1,-1];
-			}
-		}
-	}
+    for (var jj = 0; jj < d.Qipu.length; jj++) {
+        //console.log(tmpQipan.filter(function (el) { return el.pos == d.Qipu[jj][0];}));
+        for (var ii = 0; ii < tmpQipan.length; ii++) {
+            var tmp = tmpQipan[ii].pos;
+            if (tmp[0] == d.Qipu[jj][0][0] && tmp[1] == d.Qipu[jj][0][1]) {
+                movefrom = tmpQipan[ii];
+                var id = movefrom.id;
+                if (id == 0 || id == 4 || id == 8 || id == 9 || id ==10 || id == 11 || id == 12 || id == 13 || id == 14 || id == 15) {
+                    scriptNum1 = Chscr[d.Qipu[jj][0][0]];
+                    if (d.Qipu[jj][0][1] > d.Qipu[jj][1][1]) {
+                        scriptNum2 = Chscr[9 - d.Qipu[jj][0][1] + d.Qipu[jj][1][1]];
+                        scriptDir = "退";
+                    } else if (d.Qipu[jj][0][1] < d.Qipu[jj][1][1]) {
+                        scriptNum2 = Chscr[9 - d.Qipu[jj][1][1] + d.Qipu[jj][0][1]];
+                        scriptDir = "进";
+                    } else {
+                        scriptNum2 = Chscr[d.Qipu[jj][1][0]];
+                        scriptDir = "平";
+                    }
+                } else if (id == 1 || id == 2 || id == 3 || id == 5 || id == 6 || id == 7) {
+                    scriptNum1 = Chscr[d.Qipu[jj][0][0]];
+                    scriptNum2 = Chscr[d.Qipu[jj][1][0]];
+                    if (d.Qipu[jj][0][1] > d.Qipu[jj][1][1]) {
+                        scriptDir = "退";
+                    } else {
+                        scriptDir = "进";
+                    }           
+                }　else if (id == 16 || id == 20 || id == 24 || id == 25 || id ==26 || id == 27 || id == 28 || id == 29 || id == 30 || id == 31) {
+                    scriptNum1 = parseInt(d.Qipu[jj][0][0])+1;
+                    if (d.Qipu[jj][0][1] < d.Qipu[jj][1][1]) {
+                        scriptNum2 = d.Qipu[jj][1][1] - d.Qipu[jj][0][1];
+                        scriptDir = "退";
+                    } else if (d.Qipu[jj][0][1] > d.Qipu[jj][1][1]) {
+                        scriptNum2 = d.Qipu[jj][0][1] - d.Qipu[jj][1][1];
+                        scriptDir = "进";
+                    } else {
+                        scriptNum2 = parseInt(d.Qipu[jj][1][0])+1;
+                        scriptDir = "平";
+                    }                   
+                }　else {
+                    scriptNum1 = parseInt(d.Qipu[jj][0][0])+1;
+                    scriptNum2 = parseInt(d.Qipu[jj][1][0])+1;
+                    if (d.Qipu[jj][0][1] < d.Qipu[jj][1][1]) {
+                        scriptDir = "退";
+                    } else {
+                        scriptDir = "进";
+                    }                   
+                }
+                qipuScript.append("p").html(movefrom.name + scriptNum1 + scriptDir + scriptNum2);
+                //image does not work
+                qipuScript.append("svg:image")
+                          .attr("xlink:href", "resource/exclamation-mark.jpg")
+                          .style("width", "15px")
+                          .style("height", "15px");
+                tmpQipan[ii].pos = d.Qipu[jj][1];
+            } else if (tmp[0] == d.Qipu[jj][1][0] && tmp[1] == d.Qipu[jj][1][1]) {
+                moveto = tmpQipan[ii];
+                tmpQipan[ii].pos = [-1,-1];
+            }
+        }
+    }
 }
 
 //初始化网页
 var QiJu = d3.select("body")
-			 .append("div")
-			 .attr("class", "ivcont")
-			 .attr("id", "QiPan");
+             .append("div")
+             .attr("class", "ivcont")
+             .attr("id", "QiPan");
 QiJu = init("QiPan", w, h, readQipu(testqipu));
 initQiPan(QiJu);
 
 
 //读取库中棋谱
 function checkOption(){
-	var opt = d3.selectAll("option")[0].filter( function (el) {
-			return el.selected == true;
-		});
-	var d = opt[0].__data__;
-	if (d.title) {
-		QiJu.data = readQipu(d);
-		initQiPan(QiJu);
-	} else alert("棋谱不存在");
-	return 0;
+    var opt = d3.selectAll("option")[0].filter( function (el) {
+            return el.selected == true;
+        });
+    var d = opt[0].__data__;
+    if (d.title) {
+        QiJu.data = readQipu(d);
+        initQiPan(QiJu);
+    } else alert("棋谱不存在");
+    return 0;
 }
-//扩展为全局函数	
+//扩展为全局函数 
 window.checkOption = checkOption;
 
 //读取本地棋谱
 $.getJSON("database/Qipu.json", function(dat) {
-	/*
-	var QiPuOrig = [];
-	QiPuOrig.movelist = data.movelist;
-	QiPuOrig.title = data.title;
-	QiPuOrig.binit = data.binit;
-	QiPuOrig.hint = data.comment0;
-	*/
-	
-	var legend = d3.select("body").append("div")
-	  .attr("class", "userviscontrols");
+    /*
+    var QiPuOrig = [];
+    QiPuOrig.movelist = data.movelist;
+    QiPuOrig.title = data.title;
+    QiPuOrig.binit = data.binit;
+    QiPuOrig.hint = data.comment0;
+    */
+    
+    var legend = d3.select("body").append("div")
+      .attr("class", "userviscontrols");
 
-	var options = legend.append("select")
-						.on("change", function(){eval("window.checkOption()");})
-						.attr("name", "适情雅趣 卷一")
-						.selectAll("option")
-						.data(dat);
-	options.enter().append("option")
-		   .attr("value", function (d,i) {return i;})
-		   .text(function(d) { return d.title;});
-		   
+    var options = legend.append("select")
+                        .on("change", function(){eval("window.checkOption()");})
+                        .attr("name", "适情雅趣 卷一")
+                        .selectAll("option")
+                        .data(dat);
+    options.enter().append("option")
+           .attr("value", function (d,i) {return i;})
+           .text(function(d) { return d.title;});
+           
 
-});	
+}); 
     </script>
-	
+    
 <!-- just for fun, may google be helpful -->
 <form method="get" action="http://www.google.com/search">
    <input type="text" name="q" size="30" lang="zh" x-webkit-speech/>
@@ -523,11 +523,11 @@ $.getJSON("database/Qipu.json", function(dat) {
 </audio>
 <button onclick="document.getElementById('aud').play();">解释</button>
 <div>
-	<img src="resource/Like.png" width="30px" height="30px">
-	<img src="resource/Dislike.png" width="30px" height="30px">
-	<img src="resource/question.png" width="30px" height="30px">
-	<img src="resource/Play_button.png" onclick="document.getElementById('aud').play();" width="30px" height="30px">
-	<img src="resource/Comment.jpg" width="30px" height="30px">
+    <img src="resource/Like.png" width="30px" height="30px">
+    <img src="resource/Dislike.png" width="30px" height="30px">
+    <img src="resource/question.png" width="30px" height="30px">
+    <img src="resource/Play_button.png" onclick="document.getElementById('aud').play();" width="30px" height="30px">
+    <img src="resource/Comment.jpg" width="30px" height="30px">
 </div>
 
 

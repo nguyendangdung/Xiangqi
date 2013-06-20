@@ -61,21 +61,21 @@ XiangqiView.prototype = {
              [{x:3, y:9}, {x:5, y:7}],
              [{x:3, y:7}, {x:5, y:9}],
              [{x:0, y:0}, {x:0, y:9}],
-             [{x:8, y:0}, {x:8, y:9}],	
-             [{x:1, y:0}, {x:1, y:4}],	
-             [{x:1, y:5}, {x:1, y:9}],	
-             [{x:2, y:0}, {x:2, y:4}],	
+             [{x:8, y:0}, {x:8, y:9}],
+             [{x:1, y:0}, {x:1, y:4}],
+             [{x:1, y:5}, {x:1, y:9}],
+             [{x:2, y:0}, {x:2, y:4}],
              [{x:2, y:5}, {x:2, y:9}],
-             [{x:3, y:0}, {x:3, y:4}],	
+             [{x:3, y:0}, {x:3, y:4}],
              [{x:3, y:5}, {x:3, y:9}],
-             [{x:4, y:0}, {x:4, y:4}],	
+             [{x:4, y:0}, {x:4, y:4}],
              [{x:4, y:5}, {x:4, y:9}],
-             [{x:5, y:0}, {x:5, y:4}],	
+             [{x:5, y:0}, {x:5, y:4}],
              [{x:5, y:5}, {x:5, y:9}],
-             [{x:6, y:0}, {x:6, y:4}],	
+             [{x:6, y:0}, {x:6, y:4}],
              [{x:6, y:5}, {x:6, y:9}],
-             [{x:7, y:0}, {x:7, y:4}],	
-             [{x:7, y:5}, {x:7, y:9}]					 
+             [{x:7, y:0}, {x:7, y:4}],
+             [{x:7, y:5}, {x:7, y:9}]
         ];
         var datatext = [{name:"楚河", x:2, y:4.5},
                         {name:"汉界", x:6, y:4.5}];
@@ -185,7 +185,7 @@ XiangqiView.prototype = {
             .on("drag", dragmove)
             .on("dragend", dragend);
         
-		function dragstart(d,i) {
+        function dragstart(d,i) {
             d.dragStarted = self.controller.moveStart(d.pos); // 通知controller新一步开始
             
             if (d.dragStarted) {
@@ -208,8 +208,8 @@ XiangqiView.prototype = {
             } else {
                 document.body.style.cursor = "not-allowed";
             }
-		}
-		
+        }
+        
         function dragmove(d, i) {
             // TODO: 有位移偏差
             if (d.dragStarted) {
@@ -242,16 +242,16 @@ XiangqiView.prototype = {
         this.svg.selectAll("text.QiNames").call(drag);
     },
     
-	showAllScripts: function(scripts) {
-		var self=this;
+    showAllScripts: function(scripts) {
+        var self=this;
         
-		this.qipuBox
+        this.qipuBox
             .selectAll("p")
             .data(scripts)
             .enter()
             .append("p")
             .html(function (d) {return d;}); 
-	},
+    },
     
 };
 

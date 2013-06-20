@@ -28,7 +28,7 @@ function XiangqiData() {
         //{
         //    from:   [1,1],
         //    to:     [1,2],
-		//	  name: null, // or Pieces.Ma
+        //    name: null, // or Pieces.Ma
         //    eaten:  null, // or {Pieces.Ma, player}
         //    player: 0, // moved by player 0
         //}, ...
@@ -66,7 +66,7 @@ XiangqiEngine.prototype = {
         this.data.moves.push({
             from:   from,
             to:     to,
-			name:	name,
+            name:   name,
             eaten:  eaten,
             player: player,
         });
@@ -77,171 +77,171 @@ XiangqiEngine.prototype = {
     undoMove: function() {
         // 撤销一步
         // 返回该步
-		if (this.data.moves.length==0) {
+        if (this.data.moves.length==0) {
             alert("Can not undo further.");
             return null;
         } else {
             var move = this.data.moves.pop();
-			this.data.board[move.from[0]+move.from[1]*9] = {
+            this.data.board[move.from[0]+move.from[1]*9] = {
                 name: move.name,
                 player: move.player
             };
-			this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
+            this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
             
             this.data.cachedMoves.push(move);
             return move;
-		}
+        }
     },
     redoMove: function() {
         // 恢复一步
         // 返回该步
-		if (this.data.cachedMoves.length==0) {
+        if (this.data.cachedMoves.length==0) {
             alert("Can not redo further.");
             return null;
         } else {
             var move = this.data.cachedMoves.pop();
-			this.newMove(move.from, move.to, move.name, move.player, true);
+            this.newMove(move.from, move.to, move.name, move.player, true);
             return move;
-		}
+        }
     },
     
     canMove: function(from, player, board) {
         // 是否合法
-		// return all the possible "to"s
-		// 错误：null.player undefined
-		var tos=[];
-		var name = board[from[0]+from[1]*9].name;
-		if (name==Pieces.JU) {
-			//可行解：不被阻挡&在棋盘内&不吃自己的子
-			for (var i=0;i<from[0];i++) {
-				var tmpflag=true;
-				for (var j=i+1;j<from[0];j++) {
-					if (board[j+from[1]*9]!=null) tmpflag=false;
-				}
-				if (tmpflag && (board[i+from[1]*9]==null || board[i+from[1]*9].player!=player)) tos.push([i,from[1]]); 
-			}
-			for (var i=8;i>from[0];i--) {
-				var tmpflag=true;
-				for (var j=i-1;j>from[0];j--) {
-					if (board[j+from[1]*9]!=null) tmpflag=false;
-				}
-				if (tmpflag && (board[i+from[1]*9]==null || board[i+from[1]*9].player!=player)) tos.push([i,from[1]]); 
-			}			
-			for (var i=0;i<from[1];i++) {
-				var tmpflag=true;
-				for (var j=i+1;j<from[1];j++) {
-					if (board[from[0]+j*9]!=null) tmpflag=false;
-				}
-				if (tmpflag && (board[from[0]+i*9]==null || board[from[0]+i*9].player!=player)) tos.push([from[0],i]); 
-			}			
-			for (var i=9;i>from[1];i--) {
-				var tmpflag=true;
-				for (var j=i-1;j>from[1];j--) {
-					if (board[from[0]+j*9]!=null) tmpflag=false;
-				}
-				if (tmpflag && (board[from[0]+i*9]==null || board[from[0]+i*9].player!=player)) tos.push([from[0],i]); 
-			}			
-			
-		} else if (name==Pieces.MA) {
-			//可行解：不别马脚&在棋盘内&不吃自己的子
-			var majiao=[[from[0]-1,from[1]],[from[0]-1,from[1]],[from[0],from[1]+1],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0]+1,from[1]],[from[0],from[1]-1],[from[0],from[1]-1]];
-			var possibletos=[[from[0]-2,from[1]-1],[from[0]-2,from[1]+1],[from[0]-1,from[1]+2],[from[0]+1,from[1]+2],[from[0]+2,from[1]+1],[from[0]+2,from[1]-1],[from[0]+1,from[1]-2],[from[0]-1,from[1]-2]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (board[majiao[i][0]+majiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player==1-player)) tos.push(possibletos[i]);
-			}
-		} else if (name==Pieces.XIANG0) {
-			//可行解：不别相脚&在棋盘内&不吃自己的子&在自己棋盘内
-			var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
-			var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<5 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-			}
-		} else if (name==Pieces.XIANG1) {
-			//可行解：不别相脚&在棋盘内&不吃自己的子&在自己棋盘内
-			var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
-			var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=5 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-			}
-		} else if (name==Pieces.SHI0) {
-			//可行解：在米字格内&不吃自己的子
-			var possibletos=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>=0 && possibletos[i][1]<3 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-			}
-		} else if (name==Pieces.SHI1) {
-			//可行解：在米字格内&不吃自己的子
-			var possibletos=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>6 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-			}
-		} else if (name==Pieces.SHUAI) {
-			//可行解：在米字内&不吃自己的子
-			var possibletos=[[from[0]-1,from[1]],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0],from[1]-1]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>=0 && possibletos[i][1]<3 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-			}
-		} else if (name==Pieces.JIANG) {
-			//可行解：在米字内&不吃自己的子
-			var possibletos=[[from[0]-1,from[1]],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0],from[1]-1]];
-			for (var i=0; i<possibletos.length; i++) {
-				if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>6 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-			}
-		} else if (name==Pieces.PAO) {
-			//可行解：不被阻挡&在棋盘内&不吃自己的子 || 跳一个子吃别人的子
-			for (var i=0;i<from[0];i++) {
-				var tmp=0;
-				for (var j=i+1;j<from[0];j++) {
-					if (board[j+from[1]*9]!=null) tmp++;
-				}
-				if (tmp==0 && board[i+from[1]*9]==null) tos.push([i,from[1]])
-				else if (tmp==1 && board[i+from[1]*9]!=null && board[i+from[1]*9].player==1-player) tos.push([i,from[1]]);
-			}
-			for (var i=8;i>from[0];i--) {
-				var tmp=0;
-				for (var j=i-1;j>from[0];j--) {
-					if (board[j+from[1]*9]!=null) tmp++;
-				}
-				if (tmp==0 && board[i+from[1]*9]==null) tos.push([i,from[1]])
-				else if (tmp==1 && board[i+from[1]*9]!=null && board[i+from[1]*9].player==1-player) tos.push([i,from[1]]);
-			}			
-			for (var i=0;i<from[1];i++) {
-				var tmp=0;
-				for (var j=i+1;j<from[1];j++) {
-					if (board[from[0]+j*9]!=null) tmp++;
-				}
-				if (tmp==0 && board[from[0]+i*9]==null) tos.push([from[0],i])
-				else if (tmp==1 && board[from[0]+i*9]!=null && board[from[0]+i*9].player==1-player) tos.push([from[0],i]);
-			}			
-			for (var i=9;i>from[1];i--) {
-				var tmp=0;
-				for (var j=i-1;j>from[1];j--) {
-					if (board[from[0]+j*9]!=null) tmp++;
-				}
-				if (tmp==0 && board[from[0]+i*9]==null) tos.push([from[0],i])
-				else if (tmp==1 && board[from[0]+i*9]!=null && board[from[0]+i*9].player==1-player) tos.push([from[0],i]);
-			}			
-			
-		} else if (name==Pieces.BING) {
-			//可行解：过河否&在棋盘内&不吃自己的子
-			if (from[1]<5 && (board[from[0]+(from[1]+1)*9]==null || board[from[0]+(from[1]+1)*9].player!=player)) tos.push([from[0],from[1]+1]);
-			if (from[1]>4) {
-				var possibletos=[[from[0]-1,from[1]],[from[0],from[1]+1],[from[0]+1,from[1]]];
-				for (var i=0; i<possibletos.length; i++) {
-					if (possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-				}				
-			}
-		} else {
-			// 卒可行解：过河否&在棋盘内&不吃自己的子
-			if (from[1]>4 && (board[from[0]+(from[1]-1)*9]==null || board[from[0]+(from[1]-1)*9].player!=player)) tos.push([from[0],from[1]-1]);
-			if (from[1]<5) {
-				var possibletos=[[from[0]-1,from[1]],[from[0],from[1]-1],[from[0]+1,from[1]]];
-				for (var i=0; i<possibletos.length; i++) {
-					if (possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
-				}				
-			}			
-		}
-		return tos;
+        // return all the possible "to"s
+        // 错误：null.player undefined
+        var tos=[];
+        var name = board[from[0]+from[1]*9].name;
+        if (name==Pieces.JU) {
+            //可行解：不被阻挡&在棋盘内&不吃自己的子
+            for (var i=0;i<from[0];i++) {
+                var tmpflag=true;
+                for (var j=i+1;j<from[0];j++) {
+                    if (board[j+from[1]*9]!=null) tmpflag=false;
+                }
+                if (tmpflag && (board[i+from[1]*9]==null || board[i+from[1]*9].player!=player)) tos.push([i,from[1]]); 
+            }
+            for (var i=8;i>from[0];i--) {
+                var tmpflag=true;
+                for (var j=i-1;j>from[0];j--) {
+                    if (board[j+from[1]*9]!=null) tmpflag=false;
+                }
+                if (tmpflag && (board[i+from[1]*9]==null || board[i+from[1]*9].player!=player)) tos.push([i,from[1]]); 
+            }           
+            for (var i=0;i<from[1];i++) {
+                var tmpflag=true;
+                for (var j=i+1;j<from[1];j++) {
+                    if (board[from[0]+j*9]!=null) tmpflag=false;
+                }
+                if (tmpflag && (board[from[0]+i*9]==null || board[from[0]+i*9].player!=player)) tos.push([from[0],i]); 
+            }           
+            for (var i=9;i>from[1];i--) {
+                var tmpflag=true;
+                for (var j=i-1;j>from[1];j--) {
+                    if (board[from[0]+j*9]!=null) tmpflag=false;
+                }
+                if (tmpflag && (board[from[0]+i*9]==null || board[from[0]+i*9].player!=player)) tos.push([from[0],i]); 
+            }           
+            
+        } else if (name==Pieces.MA) {
+            //可行解：不别马脚&在棋盘内&不吃自己的子
+            var majiao=[[from[0]-1,from[1]],[from[0]-1,from[1]],[from[0],from[1]+1],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0]+1,from[1]],[from[0],from[1]-1],[from[0],from[1]-1]];
+            var possibletos=[[from[0]-2,from[1]-1],[from[0]-2,from[1]+1],[from[0]-1,from[1]+2],[from[0]+1,from[1]+2],[from[0]+2,from[1]+1],[from[0]+2,from[1]-1],[from[0]+1,from[1]-2],[from[0]-1,from[1]-2]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (board[majiao[i][0]+majiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player==1-player)) tos.push(possibletos[i]);
+            }
+        } else if (name==Pieces.XIANG0) {
+            //可行解：不别相脚&在棋盘内&不吃自己的子&在自己棋盘内
+            var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+            var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<5 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);  
+            }
+        } else if (name==Pieces.XIANG1) {
+            //可行解：不别相脚&在棋盘内&不吃自己的子&在自己棋盘内
+            var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+            var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=5 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]); 
+            }
+        } else if (name==Pieces.SHI0) {
+            //可行解：在米字格内&不吃自己的子
+            var possibletos=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>=0 && possibletos[i][1]<3 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]); 
+            }
+        } else if (name==Pieces.SHI1) {
+            //可行解：在米字格内&不吃自己的子
+            var possibletos=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>6 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]); 
+            }
+        } else if (name==Pieces.SHUAI) {
+            //可行解：在米字内&不吃自己的子
+            var possibletos=[[from[0]-1,from[1]],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0],from[1]-1]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>=0 && possibletos[i][1]<3 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]); 
+            }
+        } else if (name==Pieces.JIANG) {
+            //可行解：在米字内&不吃自己的子
+            var possibletos=[[from[0]-1,from[1]],[from[0],from[1]+1],[from[0]+1,from[1]],[from[0],from[1]-1]];
+            for (var i=0; i<possibletos.length; i++) {
+                if (possibletos[i][0]>2 && possibletos[i][0]<6 && possibletos[i][1]>6 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]); 
+            }
+        } else if (name==Pieces.PAO) {
+            //可行解：不被阻挡&在棋盘内&不吃自己的子 || 跳一个子吃别人的子
+            for (var i=0;i<from[0];i++) {
+                var tmp=0;
+                for (var j=i+1;j<from[0];j++) {
+                    if (board[j+from[1]*9]!=null) tmp++;
+                }
+                if (tmp==0 && board[i+from[1]*9]==null) tos.push([i,from[1]])
+                else if (tmp==1 && board[i+from[1]*9]!=null && board[i+from[1]*9].player==1-player) tos.push([i,from[1]]);
+            }
+            for (var i=8;i>from[0];i--) {
+                var tmp=0;
+                for (var j=i-1;j>from[0];j--) {
+                    if (board[j+from[1]*9]!=null) tmp++;
+                }
+                if (tmp==0 && board[i+from[1]*9]==null) tos.push([i,from[1]])
+                else if (tmp==1 && board[i+from[1]*9]!=null && board[i+from[1]*9].player==1-player) tos.push([i,from[1]]);
+            }           
+            for (var i=0;i<from[1];i++) {
+                var tmp=0;
+                for (var j=i+1;j<from[1];j++) {
+                    if (board[from[0]+j*9]!=null) tmp++;
+                }
+                if (tmp==0 && board[from[0]+i*9]==null) tos.push([from[0],i])
+                else if (tmp==1 && board[from[0]+i*9]!=null && board[from[0]+i*9].player==1-player) tos.push([from[0],i]);
+            }           
+            for (var i=9;i>from[1];i--) {
+                var tmp=0;
+                for (var j=i-1;j>from[1];j--) {
+                    if (board[from[0]+j*9]!=null) tmp++;
+                }
+                if (tmp==0 && board[from[0]+i*9]==null) tos.push([from[0],i])
+                else if (tmp==1 && board[from[0]+i*9]!=null && board[from[0]+i*9].player==1-player) tos.push([from[0],i]);
+            }           
+            
+        } else if (name==Pieces.BING) {
+            //可行解：过河否&在棋盘内&不吃自己的子
+            if (from[1]<5 && (board[from[0]+(from[1]+1)*9]==null || board[from[0]+(from[1]+1)*9].player!=player)) tos.push([from[0],from[1]+1]);
+            if (from[1]>4) {
+                var possibletos=[[from[0]-1,from[1]],[from[0],from[1]+1],[from[0]+1,from[1]]];
+                for (var i=0; i<possibletos.length; i++) {
+                    if (possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);   
+                }               
+            }
+        } else {
+            // 卒可行解：过河否&在棋盘内&不吃自己的子
+            if (from[1]>4 && (board[from[0]+(from[1]-1)*9]==null || board[from[0]+(from[1]-1)*9].player!=player)) tos.push([from[0],from[1]-1]);
+            if (from[1]<5) {
+                var possibletos=[[from[0]-1,from[1]],[from[0],from[1]-1],[from[0]+1,from[1]]];
+                for (var i=0; i<possibletos.length; i++) {
+                    if (possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);   
+                }               
+            }           
+        }
+        return tos;
     },
     
     
@@ -337,51 +337,51 @@ XiangqiEngine.prototype = {
     
     moveToScript: function(move) {
         // 转换某一步为标准棋谱
-		var scriptNum1 = null, scriptNum2 = null,scriptDir = null;
-		//Chscr用于棋谱显示
-		var Chscr = ["九","八","七","六","五","四","三","二","一"];
-		if (move.player == 0 && (move.name=="车" || move.name == "帅" || move.name == "炮" || move.name == "兵")) {
-			scriptNum1 = Chscr[move.from[0]];
-			if (move.from[1] > move.to[1]) {
-				scriptNum2 = Chscr[9 - move.from[1] + move.to[1]];
-				scriptDir = "退";
-			} else if (move.from[1] < move.to[1]) {
-				scriptNum2 = Chscr[9 - move.to[1] + move.from[1]];
-				scriptDir = "进";
-			} else {
-				scriptNum2 = Chscr[move.to[0]];
-				scriptDir = "平";
-			}
-		} else if (move.player == 0 && (move.name=="马" || move.name == "仕" || move.name == "相")) {
-			scriptNum1 = Chscr[move.from[0]];
-			scriptNum2 = Chscr[move.to[0]];
-			if (move.from[1] > move.to[1]) {
-				scriptDir = "退";
-			} else {
-				scriptDir = "进";
-			}			
-		}　else if (move.player == 1 && (move.name=="车" || move.name == "将" || move.name == "炮" || move.name == "卒")) {
-			scriptNum1 = parseInt(move.from[0])+1;
-			if (move.from[1] < move.to[1]) {
-				scriptNum2 = move.to[1] - move.from[1];
-				scriptDir = "退";
-			} else if (move.from[1] > move.to[1]) {
-				scriptNum2 = move.from[1] - move.to[1];
-				scriptDir = "进";
-			} else {
-				scriptNum2 = parseInt(move.to[0])+1;
-				scriptDir = "平";
-			}					
-		}　else {
-			scriptNum1 = parseInt(move.from[0])+1;
-			scriptNum2 = parseInt(move.to[0])+1;
-			if (move.from[1] < move.to[1]) {
-				scriptDir = "退";
-			} else {
-				scriptDir = "进";
-			}					
-		}
-		return (move.name + scriptNum1 + scriptDir + scriptNum2);
+        var scriptNum1 = null, scriptNum2 = null,scriptDir = null;
+        //Chscr用于棋谱显示
+        var Chscr = ["九","八","七","六","五","四","三","二","一"];
+        if (move.player == 0 && (move.name=="车" || move.name == "帅" || move.name == "炮" || move.name == "兵")) {
+            scriptNum1 = Chscr[move.from[0]];
+            if (move.from[1] > move.to[1]) {
+                scriptNum2 = Chscr[9 - move.from[1] + move.to[1]];
+                scriptDir = "退";
+            } else if (move.from[1] < move.to[1]) {
+                scriptNum2 = Chscr[9 - move.to[1] + move.from[1]];
+                scriptDir = "进";
+            } else {
+                scriptNum2 = Chscr[move.to[0]];
+                scriptDir = "平";
+            }
+        } else if (move.player == 0 && (move.name=="马" || move.name == "仕" || move.name == "相")) {
+            scriptNum1 = Chscr[move.from[0]];
+            scriptNum2 = Chscr[move.to[0]];
+            if (move.from[1] > move.to[1]) {
+                scriptDir = "退";
+            } else {
+                scriptDir = "进";
+            }           
+        }　else if (move.player == 1 && (move.name=="车" || move.name == "将" || move.name == "炮" || move.name == "卒")) {
+            scriptNum1 = parseInt(move.from[0])+1;
+            if (move.from[1] < move.to[1]) {
+                scriptNum2 = move.to[1] - move.from[1];
+                scriptDir = "退";
+            } else if (move.from[1] > move.to[1]) {
+                scriptNum2 = move.from[1] - move.to[1];
+                scriptDir = "进";
+            } else {
+                scriptNum2 = parseInt(move.to[0])+1;
+                scriptDir = "平";
+            }                   
+        }　else {
+            scriptNum1 = parseInt(move.from[0])+1;
+            scriptNum2 = parseInt(move.to[0])+1;
+            if (move.from[1] < move.to[1]) {
+                scriptDir = "退";
+            } else {
+                scriptDir = "进";
+            }                   
+        }
+        return (move.name + scriptNum1 + scriptDir + scriptNum2);
     },
     
     getAllPieces: function() {

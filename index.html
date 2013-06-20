@@ -6,13 +6,13 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-	<h2>你问我答象棋社区</h2>
-	<p>这里是欢乐的象棋问答社区，在这里你可以自由的上传对局，听他人评头论足，也可以欣赏大师精彩对局，听网友们分析大师的意图。快来试试吧</p>
+    <h2>你问我答象棋社区</h2>
+    <p>这里是欢乐的象棋问答社区，在这里你可以自由的上传对局，听他人评头论足，也可以欣赏大师精彩对局，听网友们分析大师的意图。快来试试吧</p>
 
     <div id="qipan-container">
     </div>
-	<div id="qipu-container">
-	</div>
+    <div id="qipu-container">
+    </div>
 
 <!-- just for fun, may google be helpful -->
 <form method="get" action="http://www.google.com/search">
@@ -27,18 +27,18 @@
 </audio>
 <button onclick="document.getElementById('aud').play();">解释</button>
 <div>
-	<img src="resource/Like.png" width="30px" height="30px">
-	<img src="resource/Dislike.png" width="30px" height="30px">
-	<img src="resource/question.png" width="30px" height="30px">
-	<img src="resource/Play_button.png" onclick="document.getElementById('aud').play();" width="30px" height="30px">
-	<img src="resource/Comment.jpg" width="30px" height="30px">
+    <img src="resource/Like.png" width="30px" height="30px">
+    <img src="resource/Dislike.png" width="30px" height="30px">
+    <img src="resource/question.png" width="30px" height="30px">
+    <img src="resource/Play_button.png" onclick="document.getElementById('aud').play();" width="30px" height="30px">
+    <img src="resource/Comment.jpg" width="30px" height="30px">
 </div>
 -->
 
     <!-- javascripts -->
     <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
-	<script type="text/javascript" src="lib/jstat.min.js"></script>
-	<script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="lib/jstat.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" src="js/xiangqiDataEngine.js"></script>
     <script type="text/javascript" src="js/xiangqiView.js"></script>
     <script type="text/javascript" src="js/xiangqiController.js"></script>
@@ -58,13 +58,13 @@
         xqController.init();
 
     </script>
-	<div id="button-container">
-		<button onclick="xqController.redo();">下一步</button>
-		<button onclick="xqController.undo();">上一步</button>
-		<button onclick="">回到初始局面</button>
-		<button onclick="">旋转</button>
-		<button onclick="xqController.showAllScripts();">显示棋谱</button>
-		<button onclick="">四人游戏</button>
-	</div>	
+    <div id="button-container">
+        <button onclick="xqController.redo();">下一步</button>
+        <button onclick="xqController.undo();">上一步</button>
+        <button onclick="">回到初始局面</button>
+        <button onclick="">旋转</button>
+        <button onclick="xqController.showAllScripts();">显示棋谱</button>
+        <button onclick="">四人游戏</button>
+    </div>  
   </body>
 </html>

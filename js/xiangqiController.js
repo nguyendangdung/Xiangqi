@@ -19,28 +19,28 @@ XiangqiController.prototype = {
         // TODO: Event listener
         this.view.d3MouseEvent();
     },
-	
-	undo: function() {
+    
+    undo: function() {
         // 处理撤销
-		var move = this.engine.undoMove();
+        var move = this.engine.undoMove();
         if (move) {
             this.currentPlayer = move.player;
             this.view.drawPieces(this.engine.getAllPieces());
             this.view.d3MouseEvent();
             this.showAllScripts();
         }
-	},
-	redo: function() {
+    },
+    redo: function() {
         // 处理恢复
-		var move = this.engine.redoMove();
+        var move = this.engine.redoMove();
         if (move) {
             this.currentPlayer = (move.player==0)? 1 : 0;
             this.view.drawPieces(this.engine.getAllPieces());
             this.view.d3MouseEvent();
             this.showAllScripts();
         }
-	},
-	
+    },
+    
     moveStart: function(pos) {
         // 开始一步棋, 返回是否成功
         //highlight possible places

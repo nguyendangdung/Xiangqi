@@ -51,67 +51,9 @@ XiangqiEngine.prototype = {
     
     init: function() {
         // 初始化棋局
-        this.data.board = [
-             // Row 1
-            { name: Pieces.JU, player: 0},
-            { name: Pieces.MA, player: 0},
-            { name: Pieces.XIANG0, player: 0},
-            { name: Pieces.SHI0, player: 0},
-            { name: Pieces.SHUAI, player: 0},
-            { name: Pieces.SHI0, player: 0},
-            { name: Pieces.XIANG0, player: 0},
-            { name: Pieces.MA, player: 0},
-            { name: Pieces.JU, player: 0},
-            // Row 2
-            null, null, null, null, null, null, null, null, null,
-            // Row 3
-            null, 
-            { name: Pieces.PAO, player: 0},
-            null, null, null, null, null, 
-            { name: Pieces.PAO, player: 0},
-            null,
-            // Row 4
-            { name: Pieces.BING, player: 0},
-            null,
-            { name: Pieces.BING, player: 0},
-            null,
-            { name: Pieces.BING, player: 0},
-            null,
-            { name: Pieces.BING, player: 0},
-            null,
-            { name: Pieces.BING, player: 0},
-            // Row 5
-            null, null, null, null, null, null, null, null, null, 
-            // Row 6
-            null, null, null, null, null, null, null, null, null, 
-            // Row 7
-            { name: Pieces.ZU, player: 1},
-            null,
-            { name: Pieces.ZU, player: 1},
-            null,
-            { name: Pieces.ZU, player: 1},
-            null,
-            { name: Pieces.ZU, player: 1},
-            null,
-            { name: Pieces.ZU, player: 1},
-            // Row 8
-            null,
-            { name: Pieces.PAO, player: 1},
-            null, null, null, null, null, 
-            { name: Pieces.PAO, player: 1},
-            null,
-            // Row 9
-            null, null, null, null, null, null, null, null, null, 
-            { name: Pieces.JU, player: 1},
-            { name: Pieces.MA, player: 1},
-            { name: Pieces.XIANG1, player: 1},
-            { name: Pieces.SHI1, player: 1},
-            { name: Pieces.JIANG, player: 1},
-            { name: Pieces.SHI1, player: 1},
-            { name: Pieces.XIANG1, player: 1},
-            { name: Pieces.MA, player: 1},
-            { name: Pieces.JU, player: 1}
-        ];
+        var INIT = "0919293949596979891777062646668600102030405060708012720323436383";
+        this.data.board_init = this.loadMoves(INIT, '')[0];
+        this.data.board = this.data.board_init.slice(0);
     },
     
     
@@ -350,7 +292,7 @@ XiangqiEngine.prototype = {
         
         for (var i = 0; i < board_init.length; i++)
             if (board_init[i] === undefined)
-                board_init = null;
+                board_init[i] = null;
         
         return [board_init, moves];
     },  

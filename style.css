@@ -37,6 +37,10 @@ circle.QiZi.eating-position {
   stroke-width: 3px;
 }
 
+.dragging-ghost {
+  opacity: 0.3;
+}
+
 
 #qipan-container {
   display: inline-block;

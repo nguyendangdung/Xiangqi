@@ -41,17 +41,22 @@
 	<script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" src="js/xiangqiDataEngine.js"></script>
     <script type="text/javascript" src="js/xiangqiView.js"></script>
+    <script type="text/javascript" src="js/xiangqiController.js"></script>
     
     <script type="text/javascript">
     
         // document ready:
         var xqData = new XiangqiData(),
             xqEngine = new XiangqiEngine(xqData),
-            xqView = new XiangqiView("#qipan-container");
+            xqView = new XiangqiView("#qipan-container"),
+            xqController = new XiangqiController();
 
-        xqView.data = xqData;
+        // TODO: Rather ugly codes below
         xqView.engine = xqEngine;
-        xqView.init();
+        xqView.controller = xqController;
+        xqController.view = xqView;
+        xqController.engine = xqEngine;
+        xqController.init();
 
     </script>
 	<div id="button-container">

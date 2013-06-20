@@ -1,18 +1,22 @@
 
 
 // View
-function XiangqiView(container) {
+function XiangqiView(container, width, height) {
     this.container = d3.select(container);
     //width,height,pad,ra分别为棋盘长、宽、边距、棋子大小 
-    this.width = 500;
-    this.height = 500;
+    this.width = width || 500;
+    this.height = height || 500;
     this.pad = 80;
     this.ra = 25;
     this.engine = null; // reference to XiangqiEngine;
-    this.data = null; // reference to XiangqiData;
+    this.controller = null; //reference to XiangqiController;
     
     this.gridToX = d3.scale.linear().domain([0, 8]).range([0,this.width]);
     this.gridToY = d3.scale.linear().domain([0, 9]).range([this.height,0]);
+    
+    this.svg = this.container.append("svg")
+        .attr("height", this.height + this.pad)
+        .attr("width",  this.width + this.pad);
 }
 
 XiangqiView.prototype = {
@@ -137,7 +141,7 @@ XiangqiView.prototype = {
             //.call(drag);
     },
     
-    drawPlace: function(pos, clazz) {
+    drawCircle: function(pos, clazz) {
         // 在pos位置添加以clazz为类的circle
         var self = this;
         self.svg.append("circle")
@@ -152,12 +156,20 @@ XiangqiView.prototype = {
     },
     
     drawPossiblePosition: function(pos) {
-        this.drawPlace(pos, "possible-position");
+        this.drawCircle(pos, "possible-position");
     },
     drawEatingPosition: function(pos) {
         d3.select("#qizi-"+pos[0]+"-"+pos[1])
           .classed("eating-position", true);
     },
+        
+    clearPossiblePosition: function() {
+        this.svg.selectAll(".possible-position").remove();
+    },
+    clearEatingPosition: function() {
+        this.svg.selectAll(".eating-position").classed("eating-position", false);
+    },
+    
     
     
     //mouseEventHandler: function(event) {
@@ -175,71 +187,62 @@ XiangqiView.prototype = {
             .on("dragend", dragend);
         
 		function dragstart(d,i) {
-			//highlight possible places
-			//临时代码，测试canMove
-			var tos=self.engine.canMove(d.pos,d.player,self.data.board);
-			if (tos) {
-				for (var i=0;i<tos.length;i++) {
-					if (self.data.board[tos[i][0]+tos[i][1]*9]==null) {
-						self.drawPossiblePosition(tos[i]);
-					} else {
-                        self.drawEatingPosition(tos[i]);
-                    }
-				}
-			} else {alert("The piece have no legal move");}
+            d.dragStarted = self.controller.moveStart(d.pos); // 通知controller新一步开始
+            
+            if (d.dragStarted) {
+                // 绘制ghost棋子
+                var ghost = self.svg.append("svg:g").attr("class", "dragging-ghost");
+                ghost.append("circle")
+                    .attr("class", "QiZi")
+                    .attr("cx", self.gridToX(d.pos[0]))
+                    .attr("cy", self.gridToY(d.pos[1]))
+                    .attr("r", self.ra)
+                    .style("fill", (d.player==0)?"red":"grey")
+                    .style("opacity", 0.5)
+                    .attr("transform", "translate(" + 40 + "," + 40 + ")");
+                ghost.append("svg:text")
+                    .attr("class", "QiNames")
+                    .attr("x", self.gridToX(d.pos[0]))
+                    .attr("y", self.gridToY(d.pos[1]))
+                    .attr("transform", "translate(" + 25 + "," + 50 + ")")
+                    .text(d.name);
+            } else {
+                document.body.style.cursor = "not-allowed";
+            }
 		}
 		
         function dragmove(d, i) {
-            // TODO: 此为临时代码
-            //javascript的复杂数据对象如数组，object传值时复址，所以会同时改变
-            // Shallow copy
-            //var newObject = jQuery.extend({}, oldObject);
-            // Deep copy
-            //var newObject = jQuery.extend(true, {}, oldObject);
-            var pos = d3.mouse(this);
-            pos = [
-                d3.round(self.gridToX.invert(pos[0])),
-                d3.round(self.gridToY.invert(pos[1]))
-            ];
-            // 临时代码，此时无作用
-            return 0;
+            // TODO: 有位移偏差
+            if (d.dragStarted) {
+                // 随鼠标移动ghost棋子
+                var pos = d3.mouse(this);
+                self.svg.select("g.dragging-ghost circle")
+                    .attr("cx", pos[0])
+                    .attr("cy", pos[1]);
+                self.svg.select("g.dragging-ghost text")
+                    .attr("x", pos[0])
+                    .attr("y", pos[1]);
+            }
         }
 
         function dragend(d) {
-            // TODO: 此为临时代码
-            var pos = d3.mouse(this);
-            pos = [
-                d3.round(self.gridToX.invert(pos[0])),
-                d3.round(self.gridToY.invert(pos[1]))
-            ];
-            self.engine.newMove(d.pos, pos, d.name, d.player);
-            self.drawPieces();
-            self.d3MouseEvent(); // Very bad practice... May have memory leaks...
+            if (d.dragStarted) {
+                self.svg.select("g.dragging-ghost").remove();
+                var pos = d3.mouse(this);
+                pos = [
+                    d3.round(self.gridToX.invert(pos[0])),
+                    d3.round(self.gridToY.invert(pos[1]))
+                ];
+                self.controller.moveEnd(d.pos, pos);
+            } else {
+                document.body.style.cursor = null;
+            }
         }
         
         this.svg.selectAll("circle.QiZi").call(drag);
         this.svg.selectAll("text.QiNames").call(drag);
     },
     
-    
-    init: function() {
-        // 初始化
-        this.svg = this.container.append("svg")
-            .attr("height", this.height + this.pad)
-            .attr("width",  this.width + this.pad);
-        this.drawBoard();
-        this.engine.init();
-        this.drawPieces();
-        // TODO: Event listener
-        this.d3MouseEvent();
-    },
-	
-	undo: function() {
-		this.engine.undoMove();
-		this.drawPieces();
-		this.d3MouseEvent();
-	},
-	
 	showscript: function(container) {
 		var self=this;
 		var con=d3.select(container);
@@ -247,4 +250,6 @@ XiangqiView.prototype = {
 		var pp=con.selectAll("p").data(this.engine.data.moves);
 		pp.enter().append("p").html(function (d) {return self.engine.moveToScript(d);}); 
 	},
+    
 };
+

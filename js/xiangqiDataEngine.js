@@ -186,12 +186,19 @@ XiangqiEngine.prototype = {
 			for (var i=0; i<possibletos.length; i++) {
 				if (board[majiao[i][0]+majiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player==1-player)) tos.push(possibletos[i]);
 			}
-		} else if (name==Pieces.XIANG0 || name==Pieces.XIANG1) {
-			//可行解：不别相脚&在棋盘内&不吃自己的子
+		} else if (name==Pieces.XIANG0) {
+			//可行解：不别相脚&在棋盘内&不吃自己的子&在自己棋盘内
 			var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
 			var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
 			for (var i=0; i<possibletos.length; i++) {
-				if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
+				if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=0 && possibletos[i][1]<5 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
+			}
+		} else if (name==Pieces.XIANG1) {
+			//可行解：不别相脚&在棋盘内&不吃自己的子&在自己棋盘内
+			var xiangjiao=[[from[0]-1,from[1]-1],[from[0]-1,from[1]+1],[from[0]+1,from[1]+1],[from[0]+1,from[1]-1]];
+			var possibletos=[[from[0]-2,from[1]-2],[from[0]-2,from[1]+2],[from[0]+2,from[1]+2],[from[0]+2,from[1]-2]];
+			for (var i=0; i<possibletos.length; i++) {
+				if (board[xiangjiao[i][0]+xiangjiao[i][1]*9]==null && possibletos[i][0]>=0 && possibletos[i][0]<9 && possibletos[i][1]>=5 && possibletos[i][1]<10 && (board[possibletos[i][0]+possibletos[i][1]*9]==null || board[possibletos[i][0]+possibletos[i][1]*9].player!=player)) tos.push(possibletos[i]);	
 			}
 		} else if (name==Pieces.SHI0) {
 			//可行解：在米字格内&不吃自己的子

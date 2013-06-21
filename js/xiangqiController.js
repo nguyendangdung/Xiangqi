@@ -22,7 +22,7 @@ XiangqiController.prototype = {
     },
     
     nextTurn: function() {
-        
+        this.currentPlayer = (this.currentPlayer==0)? 1 : 0;
     },
     
     undo: function() {
@@ -42,6 +42,9 @@ XiangqiController.prototype = {
             this.view.drawPieces(this.engine.getAllPieces());
             this.view.d3MouseEvent();
             this.showAllScripts();
+            
+            this.currentPlayer = move.player;
+            this.nextTurn();
         }
     },
     jumpTo: function(moveNo) {
@@ -92,11 +95,10 @@ XiangqiController.prototype = {
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 this.view.clearEatingPosition();
                 this.view.clearPossiblePosition();
+                this.showAllScripts();
                 
                 // 下一步更换player, (注：此为游戏逻辑)
-                this.currentPlayer = (this.currentPlayer==0)? 1 : 0;
-                
-                this.showAllScripts();
+                this.nextTurn()
                 
                 return true;
             }

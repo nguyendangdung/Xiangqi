@@ -50,11 +50,15 @@ circle.possible-position {
 }
 
 
-#qipan-container {
+.qipan-container, #board1, #board2 {
   display: inline-block;
 }
 
-#qipu-container {
+#board2 {
+  padding-left: 10px;
+}
+
+.qipu-container {
   display: inline-block;
   overflow : scroll;
   height : 500px;
@@ -62,7 +66,7 @@ circle.possible-position {
   font-size: 15px;
 }
 
-#qipu-container li {
+.qipu-container li {
   -webkit-transition: background 300ms ease;
   -moz-transition: background 300ms ease;
   -ms-transition: background 300ms ease;
@@ -76,7 +80,7 @@ circle.possible-position {
   background-color: #FFFF66;
 }
 
-#qipu-container p {
+.qipu-container p {
   font-size: 15px;
   font-family: 宋体;
   cursor:default;

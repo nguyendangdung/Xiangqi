@@ -59,24 +59,37 @@ XiangqiEngine.prototype = {
     
     newMove: function(from, to, name, player, keepCache) {
         // 新一步
-        // TODO: 此为临时代码
+        // 返回新一步
+        // from==null时为添加棋子至棋盘
         var eaten = this.data.board[to[0]+to[1]*9];
-        this.data.board[to[0]+to[1]*9] = this.data.board[from[0]+from[1]*9];
-        this.data.board[from[0]+from[1]*9] = null;
-        this.data.moves.push({
+        if (from!=null) {
+            this.data.board[to[0]+to[1]*9] = this.data.board[from[0]+from[1]*9];
+            this.data.board[from[0]+from[1]*9] = null;
+        } else {
+            this.data.board[to[0]+to[1]*9] = {
+                name: name,
+                player: player,
+            };
+        }
+        var move = {
             from:   from,
             to:     to,
             name:   name,
             eaten:  eaten,
             player: player,
-        });
+        };
+        this.data.moves.push(move);
+        
         if (!keepCache) {
             this.data.cachedMoves.length = 0;
         }
+        
+        return move;
     },
     undoMove: function() {
         // 撤销一步
         // 返回该步
+        // TODO: Bug4 利用吃子的情况
         if (this.data.moves.length==0) {
             alert("Can not undo further.");
             return null;
@@ -95,6 +108,7 @@ XiangqiEngine.prototype = {
     redoMove: function() {
         // 恢复一步
         // 返回该步
+        // TODO: Bug4 利用吃子的情况
         if (this.data.cachedMoves.length==0) {
             alert("Can not redo further.");
             return null;
@@ -109,6 +123,7 @@ XiangqiEngine.prototype = {
         // 是否合法
         // return all the possible "to"s
         // 错误：null.player undefined
+        // TODO: Bug4 利用吃子的情况
         var tos=[];
         var name = board[from[0]+from[1]*9].name;
         if (name==Pieces.JU) {
@@ -247,6 +262,7 @@ XiangqiEngine.prototype = {
     
     loadMoves: function(binit, movelist) {
         // 读取字符串棋谱, 返回初始局面和棋子移动
+        // TODO: Bug4 利用吃子的情况
         var board_init = [],
             board = [],
             moves = [];
@@ -299,6 +315,7 @@ XiangqiEngine.prototype = {
     dumpMoves: function() {
         // 导出字符串棋谱
         // return moves_string
+        // TODO: Bug4 利用吃子的情况
         var binit = "",
             movelist = "";
         var init_pieces = [

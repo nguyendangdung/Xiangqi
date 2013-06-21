@@ -21,9 +21,9 @@ XiangqiController.prototype = {
         this.showAllScripts();
     },
     
-    nextTurn: function() {
+    nextTurn: function(move) {
         // 控制游戏流程
-        this.currentPlayer = (this.currentPlayer==0)? 1 : 0;
+        this.currentPlayer = (move.player==0)? 1 : 0;
     },
     
     undo: function() {
@@ -45,7 +45,7 @@ XiangqiController.prototype = {
             this.showAllScripts();
             
             this.currentPlayer = move.player;
-            this.nextTurn();
+            this.nextTurn(move);
         }
     },
     jumpTo: function(moveNo) {
@@ -98,7 +98,7 @@ XiangqiController.prototype = {
             if (tos[i][0]==to[0] && tos[i][1]==to[1]) {
                 // Available
                 // 更改棋盘
-                this.engine.newMove(from, to, this.engine.data.board[from[0]+from[1]*9].name, this.currentPlayer);
+                var move = this.engine.newMove(from, to, this.engine.data.board[from[0]+from[1]*9].name, this.currentPlayer);
                 this.view.drawPieces(this.engine.getAllPieces());
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 this.view.clearEatingPosition();
@@ -107,7 +107,7 @@ XiangqiController.prototype = {
                 
                 // 设定下一步
                 // 下一步更换player, (注：此为游戏逻辑)
-                this.nextTurn()
+                this.nextTurn(move)
                 
                 return true;
             }

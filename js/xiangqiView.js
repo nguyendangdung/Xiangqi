@@ -235,17 +235,29 @@ XiangqiView.prototype = {
         this.svg.selectAll("text.QiNames").call(drag);
     },
     
-    showAllScripts: function(scripts) {
+    showAllScripts: function(scripts, current, action) {
         var self=this;
         
+        scripts.splice(0, 0, "========");
+        current++;
+        
         var newQipu = this.qipuBox
-            .selectAll("p")
+            .selectAll("li")
             .data(scripts);
-        newQipu.enter()
-            .append("p")
-            .html(function (d) {return d;});
         newQipu.exit()
-            .remove();
+            .transition().duration(300)
+            .style("opacity",0).remove();
+        newQipu.enter()
+            .append("li")
+            .on("click", function(d, i) {
+                    action.call(self.controller, i-1);
+                })
+            .style("opacity",0)
+            .transition().duration(300)
+            .style("opacity",1);
+        newQipu
+            .html(function (d) {return d;})
+            .classed("current-step", function (d, i) {return i==current;});
     },
     
 };

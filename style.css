@@ -1,5 +1,5 @@
 body {
-  font: 10px sans-serif;
+  font: 12px sans-serif;
 }
  
 .rules line, .rules path {
@@ -59,12 +59,27 @@ circle.possible-position {
   overflow : scroll;
   height : 500px;
   width : 150px;
+  font-size: 15px;
+}
+
+#qipu-container li {
+  -webkit-transition: background 300ms ease;
+  -moz-transition: background 300ms ease;
+  -ms-transition: background 300ms ease;
+  -o-transition: background 300ms ease;
+  transition: background 300ms ease;
+  
+  cursor: pointer;
+}
+
+.current-step {
+  background-color: #FFFF66;
 }
 
 #qipu-container p {
-	font-size: 15px;
-	font-family: 宋体;
-	cursor:default;
+  font-size: 15px;
+  font-family: 宋体;
+  cursor:default;
 }
 
 .userviscontrols {

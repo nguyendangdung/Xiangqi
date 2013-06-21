@@ -18,6 +18,11 @@ XiangqiController.prototype = {
         this.view.drawPieces(this.engine.getAllPieces());
         // TODO: Event listener
         this.view.d3MouseEvent();
+        this.showAllScripts();
+    },
+    
+    nextTurn: function() {
+        
     },
     
     undo: function() {
@@ -34,11 +39,24 @@ XiangqiController.prototype = {
         // 处理恢复
         var move = this.engine.redoMove();
         if (move) {
-            this.currentPlayer = (move.player==0)? 1 : 0;
             this.view.drawPieces(this.engine.getAllPieces());
             this.view.d3MouseEvent();
             this.showAllScripts();
         }
+    },
+    jumpTo: function(moveNo) {
+        // 跳至第moveNo步
+        // 使用redo和undo来保留transition （TODO: 未完成）
+        if (moveNo > this.engine.data.moves.length-1) {
+            // redos
+            while (moveNo>this.engine.data.moves.length-1)
+                this.redo();
+        } else {
+            // undos
+            while (moveNo<this.engine.data.moves.length-1)
+                this.undo();
+        }
+    
     },
     
     moveStart: function(pos) {
@@ -88,7 +106,14 @@ XiangqiController.prototype = {
     },
     
     showAllScripts: function() {
-        var scripts = this.engine.data.moves.map(this.engine.moveToScript);
-        this.view.showAllScripts(scripts);
+        var scripts = Array.concat(
+                this.engine.data.moves,
+                this.engine.data.cachedMoves.slice().reverse()
+            ).map(this.engine.moveToScript);
+        this.view.showAllScripts(
+                scripts,
+                this.engine.data.moves.length-1,
+                this.jumpTo
+            );
     },
 };

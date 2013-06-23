@@ -167,10 +167,9 @@ XiangqiView.prototype = {
     //mouseEventHandler: function(event) {
     //    // 处理鼠标事件，拖放等
     //},
-    d3MouseEvent: function() {
+    d3MouseEvent: function(svg) {
         // TODO: 此为临时代码
         var self = this;
-        
         //棋子拖动
         var drag = d3.behavior.drag()
             .origin(Object)
@@ -179,7 +178,7 @@ XiangqiView.prototype = {
             .on("dragend", dragend);
         
         function dragstart(d,i) {
-            d.dragStarted = self.controller.moveStart(d.pos); // 通知controller新一步开始
+            d.dragStarted = self.controller.moveStart(d.pos,d.name,d.player); // 通知controller新一步开始
             
             if (d.dragStarted) {
                 // 绘制ghost棋子
@@ -225,14 +224,14 @@ XiangqiView.prototype = {
                     d3.round(self.gridToX.invert(pos[0])),
                     d3.round(self.gridToY.invert(pos[1]))
                 ];
-                self.controller.moveEnd(d.pos, pos);
+                self.controller.moveEnd(d.pos, pos, d.name, d.player);
             } else {
                 d3.select(document.body).classed("not-allowed", false);
             }
         }
-        
-        this.svg.selectAll("circle.QiZi").call(drag);
-        this.svg.selectAll("text.QiNames").call(drag);
+        var s=(svg)? svg:this.svg;
+        s.selectAll("circle.QiZi").call(drag);
+        s.selectAll("text.QiNames").call(drag);
     },
     
     showAllScripts: function(scripts, current, action) {

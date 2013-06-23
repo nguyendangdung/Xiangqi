@@ -63,12 +63,11 @@ XiangqiController.prototype = {
     
     },
     
-    moveStart: function(pos) {
+    moveStart: function(pos,name,player) {
         // 开始一步棋, 返回是否成功
         // 判断能否出棋
         //highlight possible places
-        
-        var player = this.engine.data.board[pos[0]+pos[1]*9].player;
+
         // 判断是否为该棋手出棋
         if (player != this.currentPlayer)
             return false;
@@ -90,7 +89,7 @@ XiangqiController.prototype = {
         return true;
     },
     
-    moveEnd: function(from, to) {
+    moveEnd: function(from, to, name, player) {
         // 一步棋落定, 返回是否成功
         // 若成功, 更改棋盘, 设定下一步; 若不成功, 清理moveStart作出的修改
         var tos=this.engine.canMove(from, this.currentPlayer, this.engine.data.board);
@@ -127,5 +126,13 @@ XiangqiController.prototype = {
                 this.engine.data.moves.length-1,
                 this.jumpTo
             );
+    },
+    
+    boardRotate: function() {
+        this.view.gridToY.domain([9,0]);
+        this.view.gridToX.domain([8,0]);
+        this.view.drawPieces(this.engine.getAllPieces());
+        // TODO: Event listener
+        this.view.d3MouseEvent();
     },
 };

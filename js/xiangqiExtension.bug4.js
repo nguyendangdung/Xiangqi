@@ -66,11 +66,11 @@ xqExtend(XiangqiEngine.prototype, {
     },
     
     getAllReserves: function() {
-        // 返回所有reserve棋子及其伪位置[-1,4]
+        // 返回所有reserve棋子及其位置null
         // 格式：
-        //      {name: Pieces.JU, pos: [-1,4], player: 0}
+        //      {name: Pieces.JU, pos: null, player: 0}
         var result = this.data.reserve.map(function (el) {
-            el.pos=[-1,4];
+            el.pos=null;
             return el;
         });
         return result;
@@ -212,12 +212,12 @@ xqExtend(XiangqiController.prototype, {
         // 重写nextTurn，在此调用bug4Controller的方法
 
         // 判断是否为该棋手出棋
-        if (this.id != this.bug4Controller.currentBoard ||
+        if (//this.id != this.bug4Controller.currentBoard ||
             player != this.currentPlayer)
             return false;
         
         // 判断有无可移动位置
-        if (pos[0]>-1) {
+        if (pos) {
             var tos=this.engine.canMove(pos, player, this.engine.data.board);
         } else {
             var tos=this.engine.reserveCanMove(name,player,this.engine.data.board);
@@ -241,7 +241,7 @@ xqExtend(XiangqiController.prototype, {
     moveEnd: function(from, to, name, player) {
         // 一步棋落定, 返回是否成功
         // 若成功, 更改棋盘, 设定下一步; 若不成功, 清理moveStart作出的修改
-        if (from[0]>-1) {
+        if (from) {
             var tos=this.engine.canMove(from, this.currentPlayer, this.engine.data.board);
         } else {
             var tos=this.engine.reserveCanMove(name,player,this.engine.data.board);           
@@ -250,11 +250,8 @@ xqExtend(XiangqiController.prototype, {
             if (tos[i][0]==to[0] && tos[i][1]==to[1]) {
                 // Available
                 // 更改棋盘
-                if (from[0]>-1) {
-                    var move = this.engine.newMove(from, to, this.engine.data.board[from[0]+from[1]*9].name, this.currentPlayer);
-                } else {
-                    var move = this.engine.newMove(null, to, name, this.currentPlayer);               
-                }
+                var move = this.engine.newMove(from, to, name, this.currentPlayer);               
+
                 this.view.drawPieces(this.engine.getAllPieces());
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 this.view.clearEatingPosition();

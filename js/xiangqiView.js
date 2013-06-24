@@ -129,7 +129,11 @@ XiangqiView.prototype = {
             .attr("y", function(d) {return self.gridToY(d.pos[1]);})
             .attr("text-anchor", "middle")          // horizontally middle
             .attr("dominant-baseline", "middle")    // vertically middle
-            .text(function(d) { return d.name; })
+            .text(function(d) { return d.name; });
+        //add onclick listener    
+        qizis.on("click", function(d,i) {
+            self.selectqizi(d,i,this);
+        });
         
     },
     
@@ -151,7 +155,7 @@ XiangqiView.prototype = {
         this.drawCircle(pos, "possible-position");
     },
     drawEatingPosition: function(pos) {
-        d3.select("#qizi-"+pos[0]+"-"+pos[1])
+        this.svg.select("#qizi-"+pos[0]+"-"+pos[1])
           .classed("eating-position", true);
     },
         
@@ -167,6 +171,76 @@ XiangqiView.prototype = {
     //mouseEventHandler: function(event) {
     //    // 处理鼠标事件，拖放等
     //},
+    selectqizi: function (d,i,gg) {
+        var self=this;
+        d.selected = self.controller.moveStart(d.pos,d.name,d.player); // 通知controller新一步开始
+
+        if (d.selected) {
+            d3.select(gg).selectAll("circle")
+                .style("stroke-width", 3)
+                .style("stroke", "blue")
+                .style("stroke-opacity",1);
+            if (d.pos==null) $("svg").on("mouseenter",function () {self.drawGhost(d);});
+            else self.drawGhost(d);
+        } else {
+            d3.select(document.body).classed("not-allowed", true);
+        }
+    },
+    
+    drawGhost: function (d) {
+        var self=this;
+        var pos=d3.mouse(self.svg[0][0]);
+        var ghost = self.svg.append("svg:g");
+        ghost.attr("class", "dragging-ghost")
+            //.attr("transform", "translate("+ self.pad +","+ self.pad +")")
+            ;
+        ghost.append("circle")
+            .attr("class", "QiZi")
+            .attr("cx", pos[0])
+            .attr("cy", pos[1])
+            .attr("r", self.ra)
+            .style("fill", (d.player==0)?"red":"grey");
+        ghost.append("svg:text")
+            .attr("class", "QiNames")
+            .attr("x", pos[0])
+            .attr("y", pos[1])
+            .attr("text-anchor", "middle")          // horizontally middle
+            .attr("dominant-baseline", "middle")    // vertically middle
+            .text(d.name);
+        
+        //ghost should move
+
+        self.svg.on("mousemove", self.ghostDance);
+        
+        //ghost disappear after click
+        self.svg.on("click", function() {self.moveEnd(d);});
+    },
+    
+    ghostDance: function () {
+
+        var pos = d3.mouse(this);
+        d3.select(this).select("g.dragging-ghost circle")
+            .attr("cx", pos[0])
+            .attr("cy", pos[1]);
+        d3.select(this).select("g.dragging-ghost text")
+            .attr("x", pos[0])
+            .attr("y", pos[1]);
+    },
+    
+    moveEnd: function(d) {
+        if (d.dragStarted) {
+            self.svg.select("g.dragging-ghost").remove();
+            var pos = d3.mouse(this);
+            pos = [
+                d3.round(self.gridToX.invert(pos[0])),
+                d3.round(self.gridToY.invert(pos[1]))
+            ];
+            self.controller.moveEnd(d.pos, pos, d.name, d.player);
+        } else {
+            d3.select(document.body).classed("not-allowed", false);
+        }    
+    },
+    
     d3MouseEvent: function(svg) {
         // TODO: 此为临时代码
         var self = this;

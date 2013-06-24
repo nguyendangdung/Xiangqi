@@ -31,12 +31,12 @@ body {
 }
 
 circle.possible-position {
-  stroke: blue;
+  stroke: purple;
   stroke-width: 3px;
   fill-opacity: 0;
 }
 .eating-position circle {
-  stroke: blue;
+  stroke: purple;
   stroke-width: 3px;
 }
 

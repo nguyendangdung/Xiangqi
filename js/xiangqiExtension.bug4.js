@@ -34,6 +34,14 @@ xqExtend(XiangqiEngine.prototype, {
         this.data.reserve.push(eaten);
     },
     
+    removeFromReserve: function(name, player) {
+        var reserve = this.data.reserve;
+        for (var i=0; i<reserve.length; i++) {
+            if (reserve[i].name == name && reserve[i].player == player)
+                reserve.splice(i, 1);
+        }
+    },
+    
     reserveCanMove: function(name, player, board) {
         //规则测试区，按实际游戏性调整
         if (name == Pieces.JU || name == Pieces.MA || name == Pieces.PAO) {
@@ -99,6 +107,9 @@ xqExtend(XiangqiView.prototype, {
     refreshReserve: function(allReserve) {
         // 更新保留框
         var self=this;
+        
+        this.reservesvg.selectAll("g.qizis").remove();
+        
         var reserveqizis=this.reservesvg.selectAll("g").data(allReserve).enter().append("g").classed("qizis", true);
         reserveqizis.append("circle")
         .attr("class", "QiZi")
@@ -127,7 +138,7 @@ xqExtend(XiangqiView.prototype, {
         
         function selectQizi(d) {
             // 在保留框中选中棋子
-            d3.event.stopPropagation();
+            d3.event.stopPropagation(); // 阻止其他
             if (selected == null) {
                 // 若还未选择棋子
                 
@@ -189,7 +200,7 @@ xqExtend(XiangqiView.prototype, {
                 self.controller.moveEnd(d.pos, pos, d.name, d.player);
                 
                 
-                selected.remove();
+                //selected.remove();
                 selected = null;
                 // 注销listener
                 self.svg
@@ -296,7 +307,12 @@ xqExtend(XiangqiController.prototype, {
                 // Available
                 // 更改棋盘
                 var move = this.engine.newMove(from, to, name, this.currentPlayer);               
-
+                
+                if (from == null) {
+                    // 外来棋子
+                    this.engine.removeFromReserve(name, this.currentPlayer);
+                    this.view.refreshReserve(this.engine.getAllReserves(this.engine.data.reserve));
+                }
                 this.view.drawPieces(this.engine.getAllPieces());
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 this.view.clearEatingPosition();

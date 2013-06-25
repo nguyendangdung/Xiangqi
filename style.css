@@ -39,6 +39,11 @@ circle.possible-position {
   stroke: purple;
   stroke-width: 3px;
 }
+.selected-reserve circle {
+  stroke-width: 3px;
+  stroke: blue;
+  stroke-opacity:1;
+}
 
 .dragging-ghost {
   opacity: 0.3;

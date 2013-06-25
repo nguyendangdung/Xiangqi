@@ -17,7 +17,7 @@ XiangqiController.prototype = {
         this.engine.init();
         this.view.drawPieces(this.engine.getAllPieces());
         // TODO: Event listener
-        //this.view.d3MouseEvent();
+        this.view.d3MouseEvent();
         this.showAllScripts();
     },
     

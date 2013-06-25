@@ -131,9 +131,9 @@ XiangqiView.prototype = {
             .attr("dominant-baseline", "middle")    // vertically middle
             .text(function(d) { return d.name; });
         //add onclick listener    
-        qizis.on("click", function(d,i) {
-            self.selectqizi(d,i,this);
-        });
+        //qizis.on("click", function(d,i) {
+        //    self.selectqizi(d,i,this);
+        //});
         
     },
     
@@ -192,7 +192,7 @@ XiangqiView.prototype = {
         var pos=d3.mouse(self.svg[0][0]);
         var ghost = self.svg.append("svg:g");
         ghost.attr("class", "dragging-ghost")
-            //.attr("transform", "translate("+ self.pad +","+ self.pad +")")
+            .attr("transform", "translate("+ self.pad +","+ self.pad +")")
             ;
         ghost.append("circle")
             .attr("class", "QiZi")
@@ -208,12 +208,14 @@ XiangqiView.prototype = {
             .attr("dominant-baseline", "middle")    // vertically middle
             .text(d.name);
         
+        
+        // Mouse event codes are removed:
         //ghost should move
 
-        self.svg.on("mousemove", self.ghostDance);
+        //self.svg.on("mousemove", self.ghostDance);
         
         //ghost disappear after click
-        self.svg.on("click", function() {self.moveEnd(d);});
+        //self.svg.on("click", function() {self.moveEnd(d);});
     },
     
     ghostDance: function () {
@@ -277,7 +279,6 @@ XiangqiView.prototype = {
         }
         
         function dragmove(d, i) {
-            // TODO: 有位移偏差
             if (d.dragStarted) {
                 // 随鼠标移动ghost棋子
                 var pos = d3.mouse(this);

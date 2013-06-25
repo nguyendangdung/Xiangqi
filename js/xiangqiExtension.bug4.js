@@ -99,8 +99,8 @@ xqExtend(XiangqiView.prototype, {
     refreshReserve: function(allReserve) {
         // 更新保留框
         var self=this;
-        var reserveqizis=this.reservesvg.selectAll("circle").data(allReserve);
-        reserveqizis.enter().append("circle")
+        var reserveqizis=this.reservesvg.selectAll("g").data(allReserve).enter().append("g").classed("qizis", true);
+        reserveqizis.append("circle")
         .attr("class", "QiZi")
         .attr("cx", function (d,i) {return (2*i+1)*self.ra;})
         .attr("cy", self.ra)
@@ -108,8 +108,8 @@ xqExtend(XiangqiView.prototype, {
         .style("fill", function(d) {return (d.player==0)?"red":"grey";})
         .style("opacity", 0.5);
         
-        var reservetext=this.reservesvg.selectAll("text").data(allReserve);
-        reservetext.enter().append("text")
+        //var reservetext=this.reservesvg.selectAll("text").data(allReserve);
+        reserveqizis.append("text")
         .attr("class", "QiNames")
             .attr("x", function(d,i) {return (2*i+1)*self.ra;})
             .attr("y", self.ra)
@@ -117,43 +117,56 @@ xqExtend(XiangqiView.prototype, {
             .attr("text-anchor", "middle")          // horizontally middle
             .attr("dominant-baseline", "middle")    // vertically middle
             .text(function(d) { return d.name; });
-        //self.d3MouseEvent(self.reservesvg); 
-        var drag = d3.behavior.drag()
-            .origin(Object)
-            .on("dragstart", dragstart)
-            .on("drag", dragmove)
-            .on("dragend", dragend);
         
-        function dragstart(d,i) {
-            d.dragStarted = self.controller.moveStart(d.pos,d.name,d.player); // 通知controller新一步开始
-            
-            if (d.dragStarted) {
-                // 绘制ghost棋子
-                var ghost = self.svg.append("svg:g").attr("class", "dragging-ghost")
-                    .attr("transform", "translate("+ self.pad +","+ self.pad +")");
-                ghost.append("circle")
-                    .attr("class", "QiZi")
-                    .attr("cx", self.gridToX(d.pos[0]))
-                    .attr("cy", self.gridToY(d.pos[1]))
-                    .attr("r", self.ra)
-                    .style("fill", (d.player==0)?"red":"grey");
-                ghost.append("svg:text")
-                    .attr("class", "QiNames")
-                    .attr("x", self.gridToX(d.pos[0]))
-                    .attr("y", self.gridToY(d.pos[1]))
-                    .attr("text-anchor", "middle")          // horizontally middle
-                    .attr("dominant-baseline", "middle")    // vertically middle
-                    .text(d.name);
+        self.reserveMouseEvent();  
+    },
+    reserveMouseEvent: function() {
+        // 鼠标事件处理，参考 d3MouseEvent
+        var self=this;
+        var selected = null;
+        
+        function selectQizi(d) {
+            // 在保留框中选中棋子
+            d3.event.stopPropagation();
+            if (selected == null) {
+                // 若还未选择棋子
+                
+                if (self.controller.moveStart(d.pos,d.name,d.player)) {// 通知controller新一步开始
+                
+                    selected = d3.select(this); // selected保存node;
+                    selected.classed("selected-reserve", true);
+                    self.svg
+                        .on("mouseenter", mouseEnterBoard)
+                        .on("mousemove", mouseMoveInBoard)
+                        .on("click", mouseDownInBoard)
+                        .on("mouseleave", mouseLeaveBoard);
+                    d3.select(document.body)
+                        .on("click", cancelSelection); // 全局单击取消选择
+                    
+                }
             } else {
-                d3.select(document.body).classed("not-allowed", true);
+                
             }
         }
         
-        function dragmove(d, i) {
-            // TODO: 有位移偏差
-            if (d.dragStarted) {
-                // 随鼠标移动ghost棋子
-                var pos = d3.mouse(this);
+        function mouseEnterBoard() {
+            // 鼠标进入棋盘
+            if (selected) {
+                var pos = d3.mouse(self.svg.select(".qizis").node());
+                self.drawGhost(selected.datum());
+            }
+        }
+        function mouseLeaveBoard() {
+            // 鼠标移出棋盘
+            if (selected) {
+                self.svg.select(".dragging-ghost").remove();
+            }
+        }
+        
+        function mouseMoveInBoard() {
+            // 在棋盘上移动鼠标(dragging)
+            if (selected) {
+                var pos = d3.mouse(self.svg.select(".qizis").node());
                 self.svg.select("g.dragging-ghost circle")
                     .attr("cx", pos[0])
                     .attr("cy", pos[1]);
@@ -162,27 +175,59 @@ xqExtend(XiangqiView.prototype, {
                     .attr("y", pos[1]);
             }
         }
-
-        function dragend(d) {
-            if (d.dragStarted) {
+        
+        function mouseDownInBoard() {
+            // 在棋盘上按下鼠标(drop)
+            if (selected) {
                 self.svg.select("g.dragging-ghost").remove();
-                var pos = d3.mouse(this);
+                var pos = d3.mouse(self.svg.select(".qizis").node());
                 pos = [
                     d3.round(self.gridToX.invert(pos[0])),
                     d3.round(self.gridToY.invert(pos[1]))
                 ];
+                var d = selected.datum();
                 self.controller.moveEnd(d.pos, pos, d.name, d.player);
-            } else {
-                d3.select(document.body).classed("not-allowed", false);
+                
+                
+                selected.remove();
+                selected = null;
+                // 注销listener
+                self.svg
+                    .on("mouseenter", null)
+                    .on("mousemove", null)
+                    .on("click", null)
+                    .on("mouseout", null);
+                d3.select(document.body)
+                    .on("click", null);
             }
         }
-        self.reservesvg.selectAll("circle.QiZi").call(drag);
-        self.reservesvg.selectAll("text.QiNames").call(drag);        
-    },
-    reserveMouseEvent: function() {
-        // 鼠标事件处理，参考 d3MouseEvent
-        var self=this;
-
+        
+        function cancelSelection() {
+            // 取消选择
+            if (selected) {
+                
+                self.controller.moveCancel();
+                
+                selected.classed("selected-reserve", false);
+                
+                selected = null;
+                // 注销listener
+                self.svg
+                    .on("mouseenter", null)
+                    .on("mousemove", null)
+                    .on("click", null)
+                    .on("mouseout", null);
+                d3.select(document.body)
+                    .on("click", null);
+                    
+                
+            }
+        }
+        
+        // 添加Listener
+        // TODO: d3js限制每个事件只有一个listener, 可能需要加namespace以区别其他listener, 如"click.bug4"
+        self.reserveBox.selectAll("g")
+            .on("click", selectQizi);
     },
 });
 
@@ -269,6 +314,14 @@ xqExtend(XiangqiController.prototype, {
         this.view.clearEatingPosition();
         this.view.clearPossiblePosition();
     },
+    
+    moveCancel: function() {
+        // 取消一步棋
+        
+        // 清理
+        this.view.clearEatingPosition();
+        this.view.clearPossiblePosition();
+    },
 });
 
 
@@ -279,7 +332,7 @@ function XiangqiBug4Controller() {
     this.engines = [];
     this.views = [];
     this.controllers = [];
-    this.currentBoard = 0; // 当前棋盘
+    //this.currentBoard = 0; // 当前棋盘
 }
 
 XiangqiBug4Controller.prototype = {
@@ -301,10 +354,10 @@ XiangqiBug4Controller.prototype = {
     
     nextTurnBug4: function(boardId, move) {
         // 棋盘boardId请求下一步
-        this.currentBoard = (this.currentBoard==0)? 1 : 0;
+        boardId = (boardId==0)? 1 : 0;
         if (move.eaten!=null) {
-            this.engines[this.currentBoard].reserve(move.eaten);
-            this.views[this.currentBoard].refreshReserve(this.engines[this.currentBoard].getAllReserves(this.engines[this.currentBoard].data.reserve));
+            this.engines[boardId].reserve(move.eaten);
+            this.views[boardId].refreshReserve(this.engines[boardId].getAllReserves(this.engines[boardId].data.reserve));
         }
         
     },

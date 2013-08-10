@@ -46,13 +46,13 @@ xqExtend(XiangqiEngine.prototype, {
         //规则测试区，按实际游戏性调整
         if (name == Pieces.JU || name == Pieces.MA || name == Pieces.PAO) {
             var possibletos=jStat.seq(player*5*9,player*5*9+5*9-1,5*9);
-        } else if (name == Pieces.XIANG) {
-            var possibletos=[2,6,18,22,26,38,42];
         } else if (name == Pieces.XIANG0) {
+            var possibletos=[2,6,18,22,26,38,42];
+        } else if (name == Pieces.XIANG1) {
             var possibletos=[2+45,6+45,18+45,22+45,26+45,38+45,42+45];
-        } else if (name == Pieces.SHI) {
-            var possibletos=[3,5,13,21,23];
         } else if (name == Pieces.SHI0) {
+            var possibletos=[3,5,13,21,23];
+        } else if (name == Pieces.SHI1) {
             var possibletos=[66,68,76,84,86];        
         } else if (name == Pieces.BING) {
             var possibletos=jStat.seq(27,45-1,18);
@@ -82,6 +82,72 @@ xqExtend(XiangqiEngine.prototype, {
             return el;
         });
         return result;
+    },
+    
+    reserveMoveToScript: function(move) {
+        // 转换某一步为标准棋谱
+        if (move.player==0) {
+            //Chscr用于棋谱显示
+            var Chscr = ["九","八","七","六","五","四","三","二","一"];
+            var scriptNum1 = Chscr[move.from[0]];
+            var scriptNum2 = Chscr[9-move.from[1]];
+        } else {
+            var scriptNum1 = parseInt(move.from[0])+1;
+            var scriptNum2 = parseInt(move.from[1])+1;
+        }
+        return (move.name + "跃" + scriptNum1 + scriptNum2);
+    },
+    
+    moveToScript: function(move) {
+        // 转换某一步为标准棋谱
+        var scriptNum1 = null, scriptNum2 = null,scriptDir = null;
+        //Chscr用于棋谱显示
+        var Chscr = ["九","八","七","六","五","四","三","二","一"];
+        if (move.from == null) {
+            if (move.player==0) {
+                scriptNum1 = Chscr[move.to[0]];
+                scriptNum2 = Chscr[9-move.to[1]];
+            } else {
+                scriptNum1 = parseInt(move.to[0])+1;
+                scriptNum2 = parseInt(move.to[1])+1;
+            }
+            return (move.name + "跃" + scriptNum1 + scriptNum2);
+        } else {
+            if (move.player == 0 && (move.name=="车" || move.name == "帅" || move.name == "炮" || move.name == "兵")) {
+                scriptNum1 = Chscr[move.from[0]];
+                if (move.from[1] > move.to[1]) {
+                    scriptNum2 = Chscr[9 - move.from[1] + move.to[1]];
+                    scriptDir = "退";
+                } else if (move.from[1] < move.to[1]) {
+                    scriptNum2 = Chscr[9 - move.to[1] + move.from[1]];
+                    scriptDir = "进";
+                } else {
+                    scriptNum2 = Chscr[move.to[0]];
+                    scriptDir = "平";
+                }
+            } else if (move.player == 0 && (move.name=="马" || move.name == "仕" || move.name == "相")) {
+                scriptNum1 = Chscr[move.from[0]];
+                scriptNum2 = Chscr[move.to[0]];
+                scriptDir = (move.from[1] > move.to[1])? "退":"进";
+            }　else if (move.player == 1 && (move.name=="车" || move.name == "将" || move.name == "炮" || move.name == "卒")) {
+                scriptNum1 = parseInt(move.from[0])+1;
+                if (move.from[1] < move.to[1]) {
+                    scriptNum2 = move.to[1] - move.from[1];
+                    scriptDir = "退";
+                } else if (move.from[1] > move.to[1]) {
+                    scriptNum2 = move.from[1] - move.to[1];
+                    scriptDir = "进";
+                } else {
+                    scriptNum2 = parseInt(move.to[0])+1;
+                    scriptDir = "平";
+                }                   
+            }　else {
+                scriptNum1 = parseInt(move.from[0])+1;
+                scriptNum2 = parseInt(move.to[0])+1;
+                scriptDir = (move.from[1] < move.to[1])? "退":"进";                 
+            }
+            return (move.name + scriptNum1 + scriptDir + scriptNum2);
+        }
     },
 });
 
@@ -317,7 +383,7 @@ xqExtend(XiangqiController.prototype, {
                 this.view.d3MouseEvent(); // Very bad practice... May have memory leaks...
                 this.view.clearEatingPosition();
                 this.view.clearPossiblePosition();
-                //this.showAllScripts();
+                this.showAllScripts();
                 
                 // 设定下一步
                 // 下一步更换player, (注：此为游戏逻辑)

@@ -372,11 +372,7 @@ XiangqiEngine.prototype = {
         } else if (move.player == 0 && (move.name=="马" || move.name == "仕" || move.name == "相")) {
             scriptNum1 = Chscr[move.from[0]];
             scriptNum2 = Chscr[move.to[0]];
-            if (move.from[1] > move.to[1]) {
-                scriptDir = "退";
-            } else {
-                scriptDir = "进";
-            }           
+            scriptDir = (move.from[1] > move.to[1])? "退":"进";
         }　else if (move.player == 1 && (move.name=="车" || move.name == "将" || move.name == "炮" || move.name == "卒")) {
             scriptNum1 = parseInt(move.from[0])+1;
             if (move.from[1] < move.to[1]) {
@@ -392,11 +388,7 @@ XiangqiEngine.prototype = {
         }　else {
             scriptNum1 = parseInt(move.from[0])+1;
             scriptNum2 = parseInt(move.to[0])+1;
-            if (move.from[1] < move.to[1]) {
-                scriptDir = "退";
-            } else {
-                scriptDir = "进";
-            }                   
+            scriptDir = (move.from[1] < move.to[1])? "退":"进";                 
         }
         return (move.name + scriptNum1 + scriptDir + scriptNum2);
     },

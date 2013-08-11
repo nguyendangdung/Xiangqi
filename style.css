@@ -85,6 +85,11 @@ circle.possible-position {
   background-color: #FFFF66;
 }
 
+.audio-explanation:after {
+  content: "♪";
+  color: red;
+}
+
 .qipu-container p {
   font-size: 15px;
   font-family: 宋体;

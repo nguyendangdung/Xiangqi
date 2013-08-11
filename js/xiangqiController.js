@@ -123,7 +123,7 @@ XiangqiController.prototype = {
         this.view.clearPossiblePosition();
     },
     
-    showAllScripts: function() {
+    showAllScripts: function(audios) {
         var scripts = Array().concat(
                 this.engine.data.moves,
                 this.engine.data.cachedMoves.slice().reverse()
@@ -131,7 +131,8 @@ XiangqiController.prototype = {
         this.view.showAllScripts(
                 scripts,
                 this.engine.data.moves.length-1,
-                this.jumpTo
+                this.jumpTo,
+                audios
             );
     },
     
@@ -164,21 +165,28 @@ XiangqiController.prototype = {
     },
     
     toggleMode: function() {
+        var self = this;
         var button=d3.select("button#mode");
         if (button[0][0].value==0) {
-            button[0][0].value=1;
-            button.html("对弈");
-            var testqipu = this.engine.loadMoves("0919293949596979891777062646668600102030405060708012720323436383","69471232666510221927232409190010796770626755101617186042775750418979807055632234186816192719727819273222686641503948304186850304666870736866628166682223686778687973817363514152513240413213736557566546274634464839232667662656664656064616060513344344342241311614682822340535594831411413282613434260437341407376204276862636342244458683358522340405838085823453453580700515536542647075242529073616654452417565604247253525485782870729161965854030443625263655151655344152858650413422304022341909341309041325042439484030495924215949413249598767866621816686676525446545446345438676812129074353594932416384212376862343483953568666648284725654668642648676161776771727725327287774545574782838537426367466364666453839");
-            xqData.board=testqipu[0];
-            xqData.board_init=testqipu[0];
-            xqData.moves=[];
-            xqData.cachedMoves=testqipu[1].slice().reverse();
-            this.view.drawBoard();
-            this.showAllScripts();
-            this.view.drawPieces(this.engine.getAllPieces());
-            // TODO: Event listener
-            this.view.d3MouseEvent();
-            this.playSoundReady("intro");
+            $.getJSON('/resource/test/soundlist.json')
+             .done(function(soundlist) {
+                button[0][0].value=1;
+                button.html("对弈");
+                var testqipu = self.engine.loadMoves("0919293949596979891777062646668600102030405060708012720323436383","69471232666510221927232409190010796770626755101617186042775750418979807055632234186816192719727819273222686641503948304186850304666870736866628166682223686778687973817363514152513240413213736557566546274634464839232667662656664656064616060513344344342241311614682822340535594831411413282613434260437341407376204276862636342244458683358522340405838085823453453580700515536542647075242529073616654452417565604247253525485782870729161965854030443625263655151655344152858650413422304022341909341309041325042439484030495924215949413249598767866621816686676525446545446345438676812129074353594932416384212376862343483953568666648284725654668642648676161776771727725327287774545574782838537426367466364666453839");
+                self.engine.loadAudios(soundlist);
+                xqData.board=testqipu[0];
+                xqData.board_init=testqipu[0];
+                xqData.moves=[];
+                xqData.cachedMoves=testqipu[1].slice().reverse();
+                self.view.drawBoard();
+                self.showAllScripts(self.engine.data.audioFiles);
+                self.view.drawPieces(self.engine.getAllPieces());
+                // TODO: Event listener
+                self.view.d3MouseEvent();
+                self.playSoundReady("intro");
+             })
+             .fail(function(_,_,error){console.log(error);});
+            
         } else {
             button[0][0].value=0;
             button.html("名局赏析");

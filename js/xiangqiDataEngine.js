@@ -34,6 +34,9 @@ function XiangqiData() {
         //}, ...
     ]; 
     this.cachedMoves= []; // 缓存的棋谱
+    this.audioRoot = "/"; // 音频解释文件根目录 TODO: 未使用
+    this.audioFiles = []; // 每一步音频解释的文件名
+                          // audioFiles[-1]为介绍音频
 }
 //XiangqiData.prototype = {
 //    // 这里添加各种data相关的函数
@@ -408,6 +411,18 @@ XiangqiEngine.prototype = {
                     });
         }
         return result;
+    },
+    
+    loadAudios: function(soundlist) {
+        // 读取音频解说文件列表
+        // audioList形如 {-1: "Intro.mp3", 19: "10-1.mp3"}
+        // TODO: 加入变招
+        
+        this.data.audioFiles.length = this.data.cachedMoves.length;
+        for (var i in soundlist) {
+            this.data.audioFiles[i] = soundlist[i];
+        }
+        
     },
 };
 

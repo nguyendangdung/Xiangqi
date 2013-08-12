@@ -34,6 +34,8 @@ XiangqiController.prototype = {
             this.view.drawPieces(this.engine.getAllPieces());
             this.view.d3MouseEvent();
             this.showAllScripts();
+            
+            this.playSoundReady();
         }
     },
     redo: function() {
@@ -47,9 +49,9 @@ XiangqiController.prototype = {
             this.currentPlayer = move.player;
             this.nextTurn(move);
 
-            var tmp=[Math.ceil(xqData.moves.length/2), xqData.moves.length% 2];
-            tmp[1]=tmp[1]==0? 2:1;
-            this.playSoundReady(tmp[0]+"-"+tmp[1]);
+            // var tmp=[Math.ceil(xqData.moves.length/2), xqData.moves.length% 2];
+            // tmp[1]=tmp[1]==0? 2:1;
+            this.playSoundReady();
             
             
         }
@@ -144,23 +146,20 @@ XiangqiController.prototype = {
         this.view.d3MouseEvent();
     },
     
-    playSoundReady: function(soundtrack) {
+    playSoundReady: function() {
+        var soundtrack = this.engine.data.soundtracks[this.engine.data.moves.length-1];
+    
         if (soundtrack) {
-            var path='/resource/test/'+soundtrack+'.mp3';
-            $.get(path)
-                .done(function() { 
-                    var mySound = soundManager.createSound({
-                        url: path
-                    });
-                    d3.select("button#soundclick")[0][0].disabled=false;
-                    d3.select("button#soundclick")
-                    .on("click", function() {mySound.play();});
-            })
-            .fail(function() { 
-                d3.select("button#soundclick")[0][0].disabled=true;
+            var path='/resource/test/'+soundtrack;
+            var mySound = soundManager.createSound({
+                url: path
             });
+            d3.select("button#soundclick")[0][0].disabled=false;
+            d3.select("button#soundclick")
+            .on("click", function() {mySound.play();});
 
-        } else d3.select("button#soundclick")[0][0].disabled=true;
+        } else 
+            d3.select("button#soundclick")[0][0].disabled=true;
             
     },
     
@@ -179,7 +178,7 @@ XiangqiController.prototype = {
                 xqData.moves=[];
                 xqData.cachedMoves=testqipu[1].slice().reverse();
                 self.view.drawBoard();
-                self.showAllScripts(self.engine.data.audioFiles);
+                self.showAllScripts(self.engine.data.soundtracks);
                 self.view.drawPieces(self.engine.getAllPieces());
                 // TODO: Event listener
                 self.view.d3MouseEvent();

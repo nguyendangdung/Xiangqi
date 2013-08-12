@@ -125,7 +125,7 @@ XiangqiController.prototype = {
         this.view.clearPossiblePosition();
     },
     
-    showAllScripts: function(audios) {
+    showAllScripts: function() {
         var scripts = Array().concat(
                 this.engine.data.moves,
                 this.engine.data.cachedMoves.slice().reverse()
@@ -134,7 +134,7 @@ XiangqiController.prototype = {
                 scripts,
                 this.engine.data.moves.length-1,
                 this.jumpTo,
-                audios
+                this.engine.data.soundtracks
             );
     },
     
@@ -178,7 +178,7 @@ XiangqiController.prototype = {
                 xqData.moves=[];
                 xqData.cachedMoves=testqipu[1].slice().reverse();
                 self.view.drawBoard();
-                self.showAllScripts(self.engine.data.soundtracks);
+                self.showAllScripts();
                 self.view.drawPieces(self.engine.getAllPieces());
                 // TODO: Event listener
                 self.view.d3MouseEvent();
@@ -189,8 +189,8 @@ XiangqiController.prototype = {
         } else {
             button[0][0].value=0;
             button.html("名局赏析");
-            xqData= new XiangqiData();
-            xqEngine = new XiangqiEngine(xqData);
+            //xqData= new XiangqiData();
+            //xqEngine = new XiangqiEngine(xqData);
             this.init();
         }
     },

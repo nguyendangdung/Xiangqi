@@ -331,9 +331,12 @@ XiangqiView.prototype = {
             .style("opacity",1);
         newQipu
             .html(function (d) {return d;})
-            .classed("current-step", function (d, i) {return i==current;})
+            .classed("current-step", function (d, i) {return i==current;});
         if (audios)
             newQipu.classed("audio-explanation", function (d,i) {return audios[i-1]!=null;});
+        else
+            newQipu
+                .classed("audio-explanation", false);
     },
     
 };

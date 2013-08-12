@@ -57,6 +57,10 @@ XiangqiEngine.prototype = {
         var INIT = "0919293949596979891777062646668600102030405060708012720323436383";
         this.data.board_init = this.loadMoves(INIT, '')[0];
         this.data.board = this.data.board_init.slice(0);
+        
+        this.data.moves = [];
+        this.data.cachedMoves = [];
+        this.data.soundtracks = [];
     },
     
     
@@ -418,6 +422,7 @@ XiangqiEngine.prototype = {
         // audioList形如 {-1: "Intro.mp3", 19: "10-1.mp3"}
         // TODO: 加入变招
         
+        this.data.soundtracks = [];
         this.data.soundtracks.length = this.data.cachedMoves.length;
         for (var i in soundlist) {
             this.data.soundtracks[i] = soundlist[i];

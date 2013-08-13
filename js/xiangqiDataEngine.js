@@ -70,7 +70,7 @@ XiangqiEngine.prototype = {
         this.branches= [
             {
                 parent:  -1, // 父分支
-                step: 0,    // 分支开始步骤
+                start: 0,    // 分支开始步骤
                 moves: [],   // 分支棋谱
             },
         ]; // 缓存的分支棋谱
@@ -84,8 +84,8 @@ XiangqiEngine.prototype = {
         // 返回新一步
         // from==null时为添加棋子至棋盘
         // type:
-        //      0 or null: 清除该分支后所有步骤
-        //      1: 创建新分支
+        //      0 or null: 创建新分支
+        //      1: 清除该分支后所有步骤
         //      2: 恢复上一步（不清除后续步骤，也不创建新分支）
         var eaten = this.data.board[to[0]+to[1]*9];
         if (from!=null) {
@@ -105,19 +105,25 @@ XiangqiEngine.prototype = {
             player: player,
         };
         
+        // 处理分支：
+        var currentBranch = this.data.branches[this.data.currentBranch];
         if (!type || type==0) {
+            if (currentBranch.moves.length+currentBranch.start > this.data.moves.length) {
+                // 创建新分支
+                this.data.branches.push({
+                    parent:  this.data.currentBranch, // 父分支
+                    start: this.data.moves.length,    // 分支开始步骤
+                    moves: [ move ],   // 分支棋谱
+                });
+                this.data.currentBranch = this.data.branches.length - 1;
+            } else {
+                // 仅添加一步
+                currentBranch.moves.push(move);
+            }
+        } else if (type==1){
             // 清除该分支后所有步骤
-            var currentBranch = this.data.branches[this.data.currentBranch];
             currentBranch.moves.length = this.data.moves.length - currentBranch.start;
             currentBranch.moves.push(move);
-        } else if (type==1){
-            // 创建新分支
-            this.data.branches.push({
-                parent:  this.data.currentBranch, // 父分支
-                start: this.data.moves.length - 1,    // 分支开始步骤
-                moves: [ move ],   // 分支棋谱
-            });
-            this.data.currentBranch = this.data.branches.length - 1;
         }
         
         this.data.moves.push(move);
@@ -138,7 +144,13 @@ XiangqiEngine.prototype = {
             };
             this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
             
+                console.log(this.data);
             // this.data.cachedMoves.push(move);
+            if (this.data.moves.length <= this.data.branches[this.data.currentBranch].start) {
+                // 撤销回上一分支
+                // TODO: Bug, 应当保留当前分支
+                this.data.currentBranch = this.data.branches[this.data.currentBranch].parent;
+            }
             return move;
         }
     },
@@ -147,7 +159,7 @@ XiangqiEngine.prototype = {
         // 返回该步
         // TODO: Bug4 利用吃子的情况
         var currentBranch = this.data.branches[this.data.currentBranch];
-        if (currentBranch.length+currentBranch.start == this.data.moves.length) {
+        if (currentBranch.moves.length+currentBranch.start == this.data.moves.length) {
             alert("Can not redo further.");
             return null;
         } else {

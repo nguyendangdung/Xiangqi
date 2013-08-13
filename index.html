@@ -11,8 +11,12 @@
 
     <div id="qipan-container" class="qipan-container">
     </div>
+    <div id="qipu-fenzhi">
     <ul id="qipu-container" class="qipu-container">
     </ul>
+    <ul id="branch-container" class="qipu-container">
+    </ul>
+    </div>
 
 <!-- just for fun, may google be helpful -->
 <form method="get" action="http://www.google.com/search">
@@ -60,7 +64,7 @@
         // document ready:
         var xqData = new XiangqiData(),
             xqEngine = new XiangqiEngine(xqData),
-            xqView = new XiangqiView("#qipan-container", 500, 500, '#qipu-container'),
+            xqView = new XiangqiView("#qipan-container", 500, 500, '#qipu-container', '#branch-container'),
             xqController = new XiangqiController();
 
         // TODO: Rather ugly codes below

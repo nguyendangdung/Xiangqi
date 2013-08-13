@@ -72,6 +72,14 @@ XiangqiController.prototype = {
     
     },
     
+    
+    switchTo: function(branchNo) {
+        // 换至branchNo分支
+        this.undo();
+        this.engine.data.currentBranch = branchNo;
+        this.redo();    
+    },
+    
     moveStart: function(pos,name,player) {
         // 开始一步棋, 返回是否成功
         // 判断能否出棋
@@ -126,16 +134,82 @@ XiangqiController.prototype = {
     },
     
     showAllScripts: function() {
+        var currentBranch = this.engine.data.branches[this.engine.data.currentBranch];
+    
         var scripts = Array().concat(
                 this.engine.data.moves,
-                this.engine.data.cachedMoves.slice().reverse()
+                currentBranch.moves.slice(this.engine.data.moves.length - currentBranch.start)
             ).map(this.engine.moveToScript);
+        
+        // 得到所有分支点
+        // TODO: bug, 由当前分支分出的分支点没有计入
+        var branchpoints = [];
+        branchpoints.length = this.engine.data.moves.length;
+        var b = this.engine.data.currentBranch;
+        while (this.engine.data.branches[b].parent != -1) {
+            branchpoints[this.engine.data.branches[b].start] = true;
+            b = this.engine.data.branches[b].parent;
+        }
+        
         this.view.showAllScripts(
                 scripts,
                 this.engine.data.moves.length-1,
                 this.jumpTo,
-                this.engine.data.soundtracks
+                this.engine.data.soundtracks,
+                branchpoints
             );
+            
+        // 得到当前分支：
+        var branches = [];
+        var currentIndex = 0;
+        if (this.engine.data.moves.length-1 == currentBranch.start && currentBranch.start!=-1 && currentBranch.parent!=-1) {
+            // 当前步位于分支开始
+            var parent = this.engine.data.branches[currentBranch.parent]
+            
+            branches.push([
+                this.engine.moveToScript(parent.moves[currentBranch.start - parent.start]),
+                currentBranch.parent
+            ]); // 父分支
+            
+            for (var i=0; i<this.engine.data.branches.length; i++) {
+                // 遍历所有分支
+                var branch = this.engine.data.branches[i];
+                if (branch.parent==currentBranch.parent && branch.start==this.engine.data.moves.length-1) {
+                    // 如果branch与当前分支有相同父分支，且branch始于当前步
+                    branches.push([
+                        this.engine.moveToScript(branch.moves[0]),
+                        i
+                    ]);
+                    if (i==this.engine.data.currentBranch)
+                        currentIndex = branches.length-1;
+                }
+            }
+        } else {
+            if (this.engine.data.moves.length>0)
+                branches.push([
+                    this.engine.moveToScript(currentBranch.moves[this.engine.data.moves.length - currentBranch.start -1]),
+                    this.engine.data.currentBranch
+                ]); // 当前分支
+            
+            for (var i=0; i<this.engine.data.branches.length; i++) {
+                // 遍历所有分支
+                var branch = this.engine.data.branches[i];
+                if (branch.parent==this.engine.data.currentBranch && branch.start==this.engine.data.moves.length-1) {
+                    // 如果branch的父分支为当前分支，且branch始于当前步
+                    branches.push([
+                        this.engine.moveToScript(branch.moves[0]),
+                        i
+                    ]);
+                }
+            }
+            
+        }
+        
+        this.view.showAllBranches(
+                branches,
+                currentIndex,
+                this.switchTo
+        );
     },
     
     boardRotate: function() {
@@ -176,7 +250,7 @@ XiangqiController.prototype = {
                 xqData.board=testqipu[0];
                 xqData.board_init=testqipu[0];
                 xqData.moves=[];
-                xqData.cachedMoves=testqipu[1].slice().reverse();
+                xqData.branches[0].moves = testqipu[1].slice();
                 self.view.drawBoard();
                 self.showAllScripts();
                 self.view.drawPieces(self.engine.getAllPieces());

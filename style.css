@@ -71,6 +71,10 @@ circle.possible-position {
   font-size: 15px;
 }
 
+#qipu-fenzhi {
+  display: inline-block;
+}
+
 .qipu-container li {
   -webkit-transition: background 300ms ease;
   -moz-transition: background 300ms ease;
@@ -81,13 +85,18 @@ circle.possible-position {
   cursor: pointer;
 }
 
-.current-step {
+.current-step, .current-branch {
   background-color: #FFFF66;
 }
 
 .audio-explanation:after {
   content: "♪";
   color: red;
+}
+
+.branch-point:after {
+  content: "B";
+  color: blue;
 }
 
 .qipu-container p {

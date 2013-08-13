@@ -1,9 +1,10 @@
 
 
 // View
-function XiangqiView(container, width, height, qipuBox) {
+function XiangqiView(container, width, height, qipuBox, branchBox) {
     this.container = d3.select(container);
     this.qipuBox = d3.select(qipuBox);
+    this.branchBox = d3.select(branchBox);
     //width,height,pad,ra分别为棋盘长、宽、边距、棋子大小 
     this.width = width || 500;
     this.height = height || 500;
@@ -309,7 +310,7 @@ XiangqiView.prototype = {
         s.selectAll("text.QiNames").call(drag);
     },
     
-    showAllScripts: function(scripts, current, action, audios) {
+    showAllScripts: function(scripts, current, action, audios, branchpoints) {
         var self=this;
         
         scripts.splice(0, 0, "========");
@@ -332,11 +333,45 @@ XiangqiView.prototype = {
         newQipu
             .html(function (d) {return d;})
             .classed("current-step", function (d, i) {return i==current;});
+        
+        // 音频解说：
         if (audios)
             newQipu.classed("audio-explanation", function (d,i) {return audios[i-1]!=null;});
         else
             newQipu
                 .classed("audio-explanation", false);
+        
+        // 分支：
+        if (branchpoints) {
+            newQipu.classed("branch-point", function (d,i) {return branchpoints[i-1];});
+        } else
+            newQipu
+                .classed("branch-point", false);
+    },
+    
+    showAllBranches: function(branches, current, action) {
+        // 在分支框中显示该步的分支
+        // branches: [[分支第一步, 分支编号], ...]
+        var self=this;
+        
+        var newBranch = this.branchBox
+            .selectAll("li")
+            .data(branches);
+        newBranch.exit()
+            .transition().duration(300)
+            .style("opacity",0).remove();
+        newBranch.enter()
+            .append("li")
+            .on("click", function(d) {
+                    action.call(self.controller, d[1]);
+                })
+            .style("opacity",0)
+            .transition().duration(300)
+            .style("opacity",1);
+        newBranch
+            .html(function (d) {return d[0];})
+            .classed("current-branch", function (d, i) {return i==current;});
+        
     },
     
 };

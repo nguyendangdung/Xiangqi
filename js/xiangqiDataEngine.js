@@ -33,7 +33,15 @@ function XiangqiData() {
         //    player: 0, // moved by player 0
         //}, ...
     ]; 
-    this.cachedMoves= []; // 缓存的棋谱
+    this.branches= [
+        {
+            parent:  -1, // 父分支
+            start: 0,    // 分支开始步骤
+            moves: [],   // 分支棋谱
+        },
+    ]; // 缓存的分支棋谱
+    this.currentBranch = 0;
+    
     this.audioRoot = "/"; // 音频解释文件根目录 TODO: 未使用
     this.soundtracks = []; // 每一步音频解释的文件名
                           // soundtracks[-1]为介绍音频
@@ -59,15 +67,26 @@ XiangqiEngine.prototype = {
         this.data.board = this.data.board_init.slice(0);
         
         this.data.moves = [];
-        this.data.cachedMoves = [];
+        this.branches= [
+            {
+                parent:  -1, // 父分支
+                step: 0,    // 分支开始步骤
+                moves: [],   // 分支棋谱
+            },
+        ]; // 缓存的分支棋谱
+        this.currentBranch = 0;
         this.data.soundtracks = [];
     },
     
     
-    newMove: function(from, to, name, player, keepCache) {
+    newMove: function(from, to, name, player, type) {
         // 新一步
         // 返回新一步
         // from==null时为添加棋子至棋盘
+        // type:
+        //      0 or null: 清除该分支后所有步骤
+        //      1: 创建新分支
+        //      2: 恢复上一步（不清除后续步骤，也不创建新分支）
         var eaten = this.data.board[to[0]+to[1]*9];
         if (from!=null) {
             this.data.board[to[0]+to[1]*9] = this.data.board[from[0]+from[1]*9];
@@ -85,12 +104,23 @@ XiangqiEngine.prototype = {
             eaten:  eaten,
             player: player,
         };
-        this.data.moves.push(move);
         
-        if (!keepCache) {
-            this.data.cachedMoves.length = 0;
+        if (!type || type==0) {
+            // 清除该分支后所有步骤
+            var currentBranch = this.data.branches[this.data.currentBranch];
+            currentBranch.moves.length = this.data.moves.length - currentBranch.start;
+            currentBranch.moves.push(move);
+        } else if (type==1){
+            // 创建新分支
+            this.data.branches.push({
+                parent:  this.data.currentBranch, // 父分支
+                start: this.data.moves.length - 1,    // 分支开始步骤
+                moves: [ move ],   // 分支棋谱
+            });
+            this.data.currentBranch = this.data.branches.length - 1;
         }
         
+        this.data.moves.push(move);
         return move;
     },
     undoMove: function() {
@@ -108,7 +138,7 @@ XiangqiEngine.prototype = {
             };
             this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
             
-            this.data.cachedMoves.push(move);
+            // this.data.cachedMoves.push(move);
             return move;
         }
     },
@@ -116,12 +146,13 @@ XiangqiEngine.prototype = {
         // 恢复一步
         // 返回该步
         // TODO: Bug4 利用吃子的情况
-        if (this.data.cachedMoves.length==0) {
+        var currentBranch = this.data.branches[this.data.currentBranch];
+        if (currentBranch.length+currentBranch.start == this.data.moves.length) {
             alert("Can not redo further.");
             return null;
         } else {
-            var move = this.data.cachedMoves.pop();
-            this.newMove(move.from, move.to, move.name, move.player, true);
+            var move = currentBranch.moves[this.data.moves.length - currentBranch.start];
+            this.newMove(move.from, move.to, move.name, move.player, 2);
             return move;
         }
     },
@@ -423,7 +454,8 @@ XiangqiEngine.prototype = {
         // TODO: 加入变招
         
         this.data.soundtracks = [];
-        this.data.soundtracks.length = this.data.cachedMoves.length;
+        this.data.soundtracks.length = this.data.branches[this.data.currentBranch].moves.length + this.data.branches[this.data.currentBranch].start;
+        // TODO: 此处有旧bug，已修正
         for (var i in soundlist) {
             this.data.soundtracks[i] = soundlist[i];
         }

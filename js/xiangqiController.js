@@ -73,10 +73,13 @@ XiangqiController.prototype = {
     },
     
     
-    switchTo: function(branchNo) {
+    switchTo: function(branch) {
         // 换至branchNo分支
         this.undo();
-        this.engine.data.currentBranch = branchNo;
+        this.engine.data.branchHistory.length = this.engine.data.historypoint+1;
+        if (this.engine.data.branchHistory[this.engine.data.historypoint]!=branch) {
+           this.engine.data.branchHistory.push(branch);
+        }
         this.redo();    
     },
     
@@ -134,21 +137,31 @@ XiangqiController.prototype = {
     },
     
     showAllScripts: function() {
-        var currentBranch = this.engine.data.branches[this.engine.data.currentBranch];
-    
-        var scripts = Array().concat(
-                this.engine.data.moves,
-                currentBranch.moves.slice(this.engine.data.moves.length - currentBranch.start)
-            ).map(this.engine.moveToScript);
+        var currentBranch = this.engine.data.branchHistory[this.engine.data.historypoint];
+
+        var scripts = [];
+        for (var i=0; i<this.engine.data.branchHistory.length-1; i++) {
+            scripts = scripts.concat(
+                this.engine.data.branchHistory[i].moves.slice(0,
+                    this.engine.data.branchHistory[i+1].start
+                    - this.engine.data.branchHistory[i].start));
+        }
+        scripts = scripts.concat(
+            this.engine.data.branchHistory[this.engine.data.branchHistory.length-1].moves.slice()).map(this.engine.moveToScript);
         
         // 得到所有分支点
-        // TODO: bug, 由当前分支分出的分支点没有计入
         var branchpoints = [];
-        branchpoints.length = this.engine.data.moves.length;
-        var b = this.engine.data.currentBranch;
-        while (this.engine.data.branches[b].parent != -1) {
-            branchpoints[this.engine.data.branches[b].start] = true;
-            b = this.engine.data.branches[b].parent;
+        branchpoints.length = scripts.length;
+        for (var i=0; i<this.engine.data.branches.length; i++) {
+            var branch = this.engine.data.branches[i]
+            var h = this.engine.data.branchHistory.indexOf(branch.parent);
+            if ((h >= 0) &&
+                ((h == this.engine.data.branchHistory.length-1) ||
+                 (branch.start <= this.engine.data.branchHistory[h+1].start))) {
+                // 如果branch的父分支出现在当前分支里
+                branchpoints[branch.start] = true;
+            }
+            
         }
         
         this.view.showAllScripts(
@@ -159,55 +172,45 @@ XiangqiController.prototype = {
                 branchpoints
             );
             
-        // 得到当前分支：
-        var branches = [];
-        var currentIndex = 0;
-        if (this.engine.data.moves.length-1 == currentBranch.start && currentBranch.start!=-1 && currentBranch.parent!=-1) {
+
+        // 得到当前步的所有分叉：
+        if (this.engine.data.moves.length==0)
+            return; // 初始状态无分叉
+            
+        var forks = []; // 位于当前步的所有分叉
+        var selected = 0;
+        var forkStart; // 分叉起点，从该分支开始分叉
+        if (this.engine.data.moves.length-1 == currentBranch.start && currentBranch.start!=-1 && currentBranch.parent!=null) {
             // 当前步位于分支开始
-            var parent = this.engine.data.branches[currentBranch.parent]
-            
-            branches.push([
-                this.engine.moveToScript(parent.moves[currentBranch.start - parent.start]),
-                currentBranch.parent
-            ]); // 父分支
-            
-            for (var i=0; i<this.engine.data.branches.length; i++) {
-                // 遍历所有分支
-                var branch = this.engine.data.branches[i];
-                if (branch.parent==currentBranch.parent && branch.start==this.engine.data.moves.length-1) {
-                    // 如果branch与当前分支有相同父分支，且branch始于当前步
-                    branches.push([
-                        this.engine.moveToScript(branch.moves[0]),
-                        i
-                    ]);
-                    if (i==this.engine.data.currentBranch)
-                        currentIndex = branches.length-1;
-                }
-            }
+            forkStart = currentBranch.parent;
         } else {
-            if (this.engine.data.moves.length>0)
-                branches.push([
-                    this.engine.moveToScript(currentBranch.moves[this.engine.data.moves.length - currentBranch.start -1]),
-                    this.engine.data.currentBranch
-                ]); // 当前分支
-            
-            for (var i=0; i<this.engine.data.branches.length; i++) {
-                // 遍历所有分支
-                var branch = this.engine.data.branches[i];
-                if (branch.parent==this.engine.data.currentBranch && branch.start==this.engine.data.moves.length-1) {
-                    // 如果branch的父分支为当前分支，且branch始于当前步
-                    branches.push([
-                        this.engine.moveToScript(branch.moves[0]),
-                        i
-                    ]);
-                }
+            forkStart = currentBranch;
+            // selected = 0;
+        }
+        
+        forks.push([
+            this.engine.moveToScript(forkStart.moves[this.engine.data.moves.length - forkStart.start -1]),
+            forkStart
+        ]); // 加入分叉起点
+        
+        for (var i=0; i<this.engine.data.branches.length; i++) {
+            // 遍历所有分支
+            var branch = this.engine.data.branches[i];
+            if (branch.parent==forkStart && branch.start==this.engine.data.moves.length-1) {
+                // 如果branch的父分支为分叉起点，且branch始于当前步
+                forks.push([
+                    this.engine.moveToScript(branch.moves[0]),
+                    branch
+                ]);
+                
+                if (branch==currentBranch)
+                    selected = forks.length - 1;
             }
-            
         }
         
         this.view.showAllBranches(
-                branches,
-                currentIndex,
+                forks,
+                selected,
                 this.switchTo
         );
     },

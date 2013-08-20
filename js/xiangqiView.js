@@ -352,22 +352,18 @@ XiangqiView.prototype = {
     showAllBranches: function(branches, current, action) {
         // 在分支框中显示该步的分支
         // branches: [[分支第一步, 分支编号], ...]
+        // TODO: transitions
         var self=this;
         
         var newBranch = this.branchBox
             .selectAll("li")
             .data(branches);
-        newBranch.exit()
-            .transition().duration(300)
-            .style("opacity",0).remove();
+        newBranch.exit().remove();
         newBranch.enter()
             .append("li")
             .on("click", function(d) {
                     action.call(self.controller, d[1]);
-                })
-            .style("opacity",0)
-            .transition().duration(300)
-            .style("opacity",1);
+                });
         newBranch
             .html(function (d) {return d[0];})
             .classed("current-branch", function (d, i) {return i==current;});

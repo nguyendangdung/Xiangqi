@@ -35,12 +35,17 @@ function XiangqiData() {
     ]; 
     this.branches= [
         {
-            parent:  -1, // 父分支
+            parent:  null, // 父分支
             start: 0,    // 分支开始步骤
             moves: [],   // 分支棋谱
         },
     ]; // 缓存的分支棋谱
-    this.currentBranch = 0;
+    this.branchHistory = [
+        this.branches[0], // 分支
+    ]; // 缓存分支
+    this.historypoint = 0; // 当前所在分支在branchHistory中编号
+        // 当前步所在分支：this.data.branchHistory[this.data.historypoint]
+        // 最后一个分支：  this.data.branchHistory[this.data.branchHistory.length-1]
     
     this.audioRoot = "/"; // 音频解释文件根目录 TODO: 未使用
     this.soundtracks = []; // 每一步音频解释的文件名
@@ -67,14 +72,19 @@ XiangqiEngine.prototype = {
         this.data.board = this.data.board_init.slice(0);
         
         this.data.moves = [];
-        this.branches= [
+        this.data.branches= [
             {
-                parent:  -1, // 父分支
+                parent:  null, // 父分支
                 start: 0,    // 分支开始步骤
                 moves: [],   // 分支棋谱
             },
         ]; // 缓存的分支棋谱
-        this.currentBranch = 0;
+        this.data.branchHistory = [
+            this.data.branches[0], // 分支
+        ]; // 缓存分支
+        this.data.historypoint = 0; // 当前所在分支在branchHistory中编号
+            // 当前步所在分支：this.data.branchHistory[this.data.historypoint]
+            // 最后一个分支：  this.data.branchHistory[this.data.branchHistory.length-1]
         this.data.soundtracks = [];
     },
     
@@ -85,7 +95,7 @@ XiangqiEngine.prototype = {
         // from==null时为添加棋子至棋盘
         // type:
         //      0 or null: 创建新分支
-        //      1: 清除该分支后所有步骤
+        //      1: 清除该分支后所有步骤 (未使用)
         //      2: 恢复上一步（不清除后续步骤，也不创建新分支）
         var eaten = this.data.board[to[0]+to[1]*9];
         if (from!=null) {
@@ -106,24 +116,34 @@ XiangqiEngine.prototype = {
         };
         
         // 处理分支：
-        var currentBranch = this.data.branches[this.data.currentBranch];
-        if (!type || type==0) {
-            if (currentBranch.moves.length+currentBranch.start > this.data.moves.length) {
-                // 创建新分支
-                this.data.branches.push({
-                    parent:  this.data.currentBranch, // 父分支
-                    start: this.data.moves.length,    // 分支开始步骤
-                    moves: [ move ],   // 分支棋谱
-                });
-                this.data.currentBranch = this.data.branches.length - 1;
-            } else {
-                // 仅添加一步
+        if (type!=2) {
+            var currentBranch = this.data.branchHistory[this.data.historypoint];
+            if (!type || type==0) {
+                if (currentBranch.moves.length+currentBranch.start > this.data.moves.length) {
+                    // 当前步不位于分支末端
+                    console.log("new branch");
+                    // 创建新分支
+                    var newBranch = {
+                        parent:  currentBranch, // 父分支
+                        start: this.data.moves.length,    // 分支开始步骤
+                        moves: [ move ],   // 分支棋谱
+                    };
+                    
+                    this.data.branches.push(newBranch); // 创建新分支
+                    this.data.historypoint++;
+                    this.data.branchHistory.length = this.data.historypoint; // 清除branchipoints新分支之后的分支
+                    this.data.branchHistory.push(newBranch);
+                } else {
+                    // 当前步位于分支末端
+                    // 仅添加一步
+                    currentBranch.moves.push(move);
+                }
+            } else if (type==1){
+                // 清除该分支后所有步骤
+                currentBranch.moves.length = this.data.moves.length - currentBranch.start;
                 currentBranch.moves.push(move);
+                this.data.branchHistory.length = this.data.historypoint+1; // 清除branchipoints新分支之后的分支
             }
-        } else if (type==1){
-            // 清除该分支后所有步骤
-            currentBranch.moves.length = this.data.moves.length - currentBranch.start;
-            currentBranch.moves.push(move);
         }
         
         this.data.moves.push(move);
@@ -144,12 +164,10 @@ XiangqiEngine.prototype = {
             };
             this.data.board[move.to[0]+move.to[1]*9] = move.eaten;
             
-                console.log(this.data);
             // this.data.cachedMoves.push(move);
-            if (this.data.moves.length <= this.data.branches[this.data.currentBranch].start) {
+            if ((this.data.historypoint!=0) && (this.data.moves.length <= this.data.branchHistory[this.data.historypoint].start)) {
                 // 撤销回上一分支
-                // TODO: Bug, 应当保留当前分支
-                this.data.currentBranch = this.data.branches[this.data.currentBranch].parent;
+                this.data.historypoint--;
             }
             return move;
         }
@@ -158,12 +176,21 @@ XiangqiEngine.prototype = {
         // 恢复一步
         // 返回该步
         // TODO: Bug4 利用吃子的情况
-        var currentBranch = this.data.branches[this.data.currentBranch];
+        var currentBranch = this.data.branchHistory[this.data.historypoint];
         if (currentBranch.moves.length+currentBranch.start == this.data.moves.length) {
             alert("Can not redo further.");
             return null;
         } else {
             var move = currentBranch.moves[this.data.moves.length - currentBranch.start];
+            
+            if ((this.data.historypoint < this.data.branchHistory.length-1) &&
+                (this.data.moves.length >= this.data.branchHistory[this.data.historypoint+1].start)
+            ) {
+                // 当前步位于分支开始的前一步
+                this.data.historypoint++;
+                currentBranch = this.data.branchHistory[this.data.historypoint];
+                move = currentBranch.moves[this.data.moves.length - currentBranch.start];
+            }
             this.newMove(move.from, move.to, move.name, move.player, 2);
             return move;
         }

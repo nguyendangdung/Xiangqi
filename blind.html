@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
@@ -16,6 +16,11 @@
     </ul>
     <ul id="branch-container" class="qipu-container">
     </ul>
+    </div>
+    <div id="qipu-input" class="qipu-input">
+    下一步：<input id="scriptInput" type="text"></input>
+    <button id="scriptButton">输入</button>
+    <button id="sB">显示棋盘</button>
     </div>
 
 <!-- just for fun, may google be helpful -->
@@ -48,6 +53,7 @@
     <script type="text/javascript" src="js/xiangqiDataEngine.js"></script>
     <script type="text/javascript" src="js/xiangqiView.js"></script>
     <script type="text/javascript" src="js/xiangqiController.js"></script>
+    <script type="text/javascript" src="js/xiangqiExtension.blind.js"></script>
     <script type="text/javascript" src="lib/soundmanager2.js"></script>
     <script>
         soundManager.setup({
@@ -71,7 +77,11 @@
         xqView.controller = xqController;
         xqController.view = xqView;
         xqController.engine = xqEngine;
-        xqController.init();
+        xqController.blind(ifDrawPiece=false);
+        
+        document.getElementById("scriptButton").onclick=function(){xqController.scriptMove();};
+        
+        document.getElementById("sB").onclick=function() {xqController.showBoard();};
 
     </script>
     <div id="button-container">
@@ -83,7 +93,7 @@
         <button id="soundclick" disabled>语音解说</button>
         <button id="mode" value="0" onclick="xqController.toggleMode();">名局赏析</button>
         <button onclick="window.location='bug4.html'">四人游戏</button>
-        <button onclick="window.location='blind.html'">盲棋</button>
+        <button onclick="window.location='index.html'">象棋</button>
     </div>  
   </body>
 </html>
